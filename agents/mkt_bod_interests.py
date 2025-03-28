@@ -15,16 +15,14 @@ def create_bod_interests_agent():
         ),
         model=OpenAIChat(id="gpt-4o"),
         tools=[
-            DuckDuckGoTools(),
+            DuckDuckGoTools(num_results=10),
             WikipediaTools(),
             PythonTools()
         ],
         instructions=[
-            "Search for the person's LinkedIn profile using DuckDuckGo. "
-            "Extract real examples from their posts or bio. "
-            "Always include source URLs for verification. "
-            "If Wikipedia is available, summarize from there too. "
-            "Otherwise, explain what was found."
+            "Search for the person's LinkedIn profile using DuckDuckGo. Then extract and summarize *specific posts or quotes* using DuckDuckGo snippets. Always provide source URLs for verification.",
+            "Use Wikipedia only if it includes a full biography. If not, explain clearly.",
+            "NEVER invent quotes or make assumptions. Use ONLY what is verifiable from tools. Label each section: [LinkedIn], [Wikipedia], [Other]"
         ],
         show_tool_calls=True,
         show_reasoning=True,
