@@ -1,0 +1,8 @@
+fastapi
+agno
+openai
+duckduckgo-search
+yfinance
+sqlalchemy
+fastapi[all]
+uvicorn
