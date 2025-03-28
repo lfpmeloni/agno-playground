@@ -4,10 +4,18 @@ from agno.storage.agent.sqlite import SqliteAgentStorage
 from tools.sec_api_tool import SECAPITool
 
 def create_board_agent():
+    sec_api_tool = SECAPITool()
+
     return Agent(
         name="mkt_board_of_directors",
         model=OpenAIChat(id="gpt-4o"),
-        tools=[SECAPITool()],
+        tools=[
+            {
+                "name": sec_api_tool.name,
+                "description": sec_api_tool.description,
+                "run": sec_api_tool.run
+            }
+        ],
         description="Use SEC API to find board of directors for a public company based on ticker symbol (e.g., PEP).",
         storage=SqliteAgentStorage(table_name="board_of_directors", db_file="tmp/agents.db"),
         markdown=True,
