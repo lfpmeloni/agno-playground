@@ -1,4 +1,4 @@
-from agno.tool import tool  # ✅ This decorator registers it as a valid tool
+from agno.tools import tool
 
 @tool
 def get_board_of_directors(ticker: str) -> str:
