@@ -27,7 +27,6 @@ def create_bod_interests_agent():
             "Label each section: [LinkedIn], [Wikipedia], [Other]"
         ],
         show_tool_calls=True,
-        show_reasoning=True,
         markdown=True,
         add_datetime_to_instructions=True,
         add_history_to_messages=True,
