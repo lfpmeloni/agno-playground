@@ -5,7 +5,7 @@ from agno.storage.agent.sqlite import SqliteAgentStorage
 # Built-in tools
 from agno.tools.duckduckgo import DuckDuckGoTools
 from agno.tools.yfinance import YFinanceTools
-from agno.tools.wikipedia import WikipediaTool
+from agno.tools.wikipedia import WikipediaTools
 from agno.tools.python import PythonTool
 
 def create_bod_interests_agent():
@@ -15,7 +15,7 @@ def create_bod_interests_agent():
         tools=[
             DuckDuckGoTools(),
             YFinanceTools(company_info=True),
-            WikipediaTool(),
+            WikipediaTools(),
             PythonTool()
         ],
         instructions=[

@@ -7,3 +7,4 @@ sqlalchemy
 fastapi[all]
 uvicorn
 python-dotenv
+wikipedia
