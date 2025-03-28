@@ -7,6 +7,14 @@ from agno.storage.agent.sqlite import SqliteAgentStorage
 from agno.tools.duckduckgo import DuckDuckGoTools
 from agno.tools.yfinance import YFinanceTools
 
+# --- CUSTOM AGENTS ---
+
+from agents.mkt_board_of_directors import create_board_agent
+from agents.mkt_bod_interests import create_bod_interests_agent
+from agents.mkt_content_generator import create_content_generator_agent
+
+# --- END OF CUSTOM AGENTS ---
+
 agent_storage: str = "tmp/agents.db"
 
 web_agent = Agent(
@@ -38,7 +46,15 @@ finance_agent = Agent(
     markdown=True,
 )
 
-app = Playground(agents=[web_agent, finance_agent]).get_app()
+app = Playground(
+    agents=[
+        web_agent, 
+        finance_agent,
+        create_board_agent(),
+        create_bod_interests_agent(),
+        create_content_generator_agent()
+    ]
+).get_app()
 
 app.add_middleware(
     CORSMiddleware,
