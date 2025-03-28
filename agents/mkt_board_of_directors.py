@@ -1,20 +1,17 @@
 from agno.agent import Agent
 from agno.models.openai import OpenAIChat
 from agno.storage.agent.sqlite import SqliteAgentStorage
-from agno.tools.duckduckgo import DuckDuckGoTools
-
+from tools.sec_api_tool import SECAPITool
 
 def create_board_agent():
     return Agent(
-        name="Board Of Directors",
+        name="mkt_board_of_directors",
         model=OpenAIChat(id="gpt-4o"),
-        tools=[DuckDuckGoTools()],
-        instructions=[
-            "Search and extract information about PepsiCo's board of directors using public sources like the SEC."
-        ],
-        storage=SqliteAgentStorage(table_name="board_directors_agent", db_file="tmp/agents.db"),
+        tools=[SECAPITool()],
+        description="Use SEC API to find board of directors for a public company based on ticker symbol (e.g., PEP).",
+        storage=SqliteAgentStorage(table_name="board_of_directors", db_file="tmp/agents.db"),
+        markdown=True,
         add_datetime_to_instructions=True,
         add_history_to_messages=True,
-        num_history_responses=5,
-        markdown=True,
+        num_history_responses=5
     )
