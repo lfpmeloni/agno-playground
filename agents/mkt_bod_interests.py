@@ -6,7 +6,7 @@ from agno.storage.agent.sqlite import SqliteAgentStorage
 from agno.tools.duckduckgo import DuckDuckGoTools
 from agno.tools.yfinance import YFinanceTools
 from agno.tools.wikipedia import WikipediaTools
-from agno.tools.python import PythonTool
+from agno.tools.python import PythonTools
 
 def create_bod_interests_agent():
     return Agent(
@@ -16,7 +16,7 @@ def create_bod_interests_agent():
             DuckDuckGoTools(),
             YFinanceTools(company_info=True),
             WikipediaTools(),
-            PythonTool()
+            PythonTools()
         ],
         instructions=[
             "You are an interest-finder agent. Your job is to research a person and return a list of interests based on their public online presence.",
