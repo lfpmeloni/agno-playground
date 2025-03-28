@@ -1,4 +1,6 @@
 from agno.tools import tool
+from dotenv import load_dotenv
+import os
 
 @tool
 def get_board_of_directors(ticker: str) -> str:
@@ -6,6 +8,8 @@ def get_board_of_directors(ticker: str) -> str:
     Retrieve board of directors for a given company ticker using SEC API.
     """
     import os, requests
+
+    load_dotenv()
 
     api_key = os.getenv("SEC_API_KEY")
     if not api_key:
