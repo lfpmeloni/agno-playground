@@ -44,7 +44,8 @@ coordinator_agent = Agent(
 # Team to orchestrate the full pipeline
 marketing_team = Team(
     name="Marketing Team",
-    team_id="marketing_team",  # Required for Agent UI routing
+    agent_id="marketing_team",
+    team_id="marketing_team",
     description="End-to-end workflow to generate personalized Crowe.com-based pages for board members.",
     model=OpenAIChat("gpt-4o"),
     members=[
