@@ -27,10 +27,10 @@ def create_content_generator_agent():
             "You will be given the name of a board member and a list of their interests.",
             "Use DuckDuckGo to search for site:Crowe.com + each interest keyword to find relevant articles.",
             "Summarize or rephrase key insights from these articles and personalize them for the given individual.",
-            "Structure the final output as a full standalone HTML page.",
-            "Call the SaveHTMLTool with the filename (e.g., daniel-vasella.html) and HTML content to save it to the public/ directory.",
-            "Also update or append the file 'public/index.html' with a link to the new personalized HTML page.",
-            "Add titles, sections, source links, and a timestamp. Keep it professional and readable."
+            "Structure the final output as a full standalone HTML page and use SaveHTMLTool to save it with the filename (e.g., darren-walker.html).",
+            "Do NOT print or include the HTML content in your response. Just confirm the save.",
+            "Respond only with a success message and the correct public URL: http://172.178.45.177:8080/<filename>. Do not mention localhost or port 3000.",
+            "Be concise. Avoid repeating steps already completed. Your response should only contain the public link and confirmation."
         ],
         markdown=True,
         show_tool_calls=True,
