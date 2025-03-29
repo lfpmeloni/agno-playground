@@ -4,7 +4,7 @@ from agno.storage.agent.sqlite import SqliteAgentStorage
 from agno.tools.duckduckgo import DuckDuckGoTools
 from agno.tools.python import PythonTools
 
-from tools.save_html_tool import SaveHTMLTool
+from tools.save_html_tool import save_html_tool
 import os
 
 # Directory where the generated HTML files will be saved
@@ -21,7 +21,7 @@ def create_content_generator_agent():
         tools=[
             DuckDuckGoTools(),
             PythonTools(),
-            SaveHTMLTool()
+            save_html_tool()
         ],
         instructions=[
             "You will be given the name of a board member and a list of their interests.",
