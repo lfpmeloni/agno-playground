@@ -19,8 +19,13 @@ from agents.mkt_content_generator import create_content_generator_agent
 # Base URL to access public HTML pages
 PUBLIC_HTML_BASE_URL = "http://172.178.45.177:8080"
 
+class UICompatibleTeam(Team):
+    @property
+    def agent_id(self):
+        return self.team_id
+
 # Define marketing team
-marketing_team = Team(
+marketing_team = UICompatibleTeam(
     name="Marketing Team",
     team_id="marketing_team",
     agent_id="marketing_team",
