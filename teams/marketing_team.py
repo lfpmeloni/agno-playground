@@ -22,6 +22,11 @@ from agents.mkt_content_generator import create_content_generator_agent
 # Base URL to access public HTML pages
 PUBLIC_HTML_BASE_URL = "http://172.178.45.177:8080"
 
+class UICompatibleTeam(Team):
+    @property
+    def agent_id(self):
+        return self.team_id
+
 # Coordinator (optional for orchestration)
 coordinator_agent = Agent(
     name="Marketing Coordinator",
@@ -42,12 +47,11 @@ coordinator_agent = Agent(
 )
 
 # Team to orchestrate the full pipeline
-marketing_team = Team(
+marketing_team = UICompatibleTeam(
     name="Marketing Team",
-    agent_id="marketing_team",
-    team_id="marketing_team",
+    team_id="marketing_team",  # This will now also serve as agent_id
     description="End-to-end workflow to generate personalized Crowe.com-based pages for board members.",
-    model=OpenAIChat("gpt-4o"),
+    model=OpenAIChat(id="gpt-4o"),
     members=[
         create_board_agent(),
         create_bod_interests_agent(),
@@ -55,13 +59,13 @@ marketing_team = Team(
     ],
     mode="coordinate",
     instructions=[
-        "You will receive a company name.",
-        "Use the Board Agent to identify directors.",
-        "Use the Interest Agent to find interests for each person.",
-        "Use the Content Generator Agent to create a public page for each member.",
-        "Confirm all pages were created and return links."
+        "You will receive the name of a company (e.g., 'PepsiCo').",
+        "Use the Board Agent to find board members.",
+        "For each member, identify their interests with the Interest Agent.",
+        "Generate a personalized insights webpage with the Content Generator Agent.",
+        "Confirm when all steps are complete and the content has been saved.",
     ],
-    success_criteria="All board members have personalized public pages created and listed in index.html.",
+    success_criteria="All board members have personalized pages created and listed in the index.",
     show_tool_calls=True,
     show_members_responses=True,
     markdown=True,
