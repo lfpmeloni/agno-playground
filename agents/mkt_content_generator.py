@@ -21,7 +21,7 @@ def create_content_generator_agent():
         tools=[
             DuckDuckGoTools(),
             PythonTools(),
-            save_html_tool()
+            save_html_tool
         ],
         instructions=[
             "You will be given the name of a board member and a list of their interests.",
