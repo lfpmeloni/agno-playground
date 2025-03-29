@@ -19,7 +19,7 @@ sudo apt update && sudo apt upgrade -y
 sudo apt install python3 python3-venv python3-pip git curl -y
 
 Install UV
-curl -LsSf https://astral.sh/uv/install.sh | sh
+curl -LsSf <https://astral.sh/uv/install.sh> | sh
 source $HOME/.cargo/env
 
 Install Docker and Docker Compose
@@ -28,7 +28,7 @@ sudo usermod -aG docker $USER
 newgrp docker
 
 Install Node.js and pnpm (for Agent UI)
-curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+curl -fsSL <https://deb.nodesource.com/setup_18.x> | sudo -E bash -
 sudo apt install -y nodejs
 npm install -g pnpm
 
@@ -40,7 +40,7 @@ sudo apt install tmux
 mkdir agno-server && cd agno-server
 python3.10 -m venv .venv && source .venv/bin/activate
 
-git clone https://github.com/agno-agi/agent-ui.git
+git clone <https://github.com/agno-agi/agent-ui.git>
 cd agent-ui
 pnpm install
 pnpm dev
