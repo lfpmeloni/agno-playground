@@ -23,6 +23,7 @@ PUBLIC_HTML_BASE_URL = "http://172.178.45.177:8080"
 marketing_team = Team(
     name="Marketing Team",
     team_id="marketing_team",
+    agent_id="marketing_team",
     description="End-to-end pipeline to generate personalized Crowe.com-based insights for board members.",
     model=OpenAIChat("gpt-4o"),
     members=[
