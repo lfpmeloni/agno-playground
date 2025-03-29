@@ -1,50 +1,19 @@
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from agno.agent import Agent
-from agno.models.openai import OpenAIChat
 from agno.playground import Playground, serve_playground_app
-from agno.storage.agent.sqlite import SqliteAgentStorage
-from agno.tools.duckduckgo import DuckDuckGoTools
-from agno.tools.yfinance import YFinanceTools
 
 # --- CUSTOM AGENTS ---
-
+from agents.exp_web_agent import web_agent
+from agents.exp_finance_agent import finance_agent
 from agents.mkt_board_of_directors import create_board_agent
 from agents.mkt_bod_interests import create_bod_interests_agent
 from agents.mkt_content_generator import create_content_generator_agent
 
-# --- END OF CUSTOM AGENTS ---
+# --- CUSTOM TEAMS ---
+from teams.marketing_team import marketing_team
+# --- END OF CUSTOM AGENTS/TEAMS ---
 
 agent_storage: str = "tmp/agents.db"
-
-web_agent = Agent(
-    name="Web Agent",
-    model=OpenAIChat(id="gpt-4o"),
-    tools=[DuckDuckGoTools()],
-    instructions=["Always include sources"],
-    storage=SqliteAgentStorage(table_name="web_agent", db_file=agent_storage),
-    add_datetime_to_instructions=True,
-    add_history_to_messages=True,
-    num_history_responses=5,
-    markdown=True,
-)
-
-finance_agent = Agent(
-    name="Finance Agent",
-    model=OpenAIChat(id="gpt-4o"),
-    tools=[YFinanceTools(
-        stock_price=True,
-        analyst_recommendations=True,
-        company_info=True,
-        company_news=True
-    )],
-    instructions=["Always use tables to display data"],
-    storage=SqliteAgentStorage(table_name="finance_agent", db_file=agent_storage),
-    add_datetime_to_instructions=True,
-    add_history_to_messages=True,
-    num_history_responses=5,
-    markdown=True,
-)
 
 app = Playground(
     agents=[
@@ -52,7 +21,8 @@ app = Playground(
         finance_agent,
         create_board_agent(),
         create_bod_interests_agent(),
-        create_content_generator_agent()
+        create_content_generator_agent(),
+        marketing_team
     ]
 ).get_app()
 
