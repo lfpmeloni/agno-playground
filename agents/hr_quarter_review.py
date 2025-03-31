@@ -2,7 +2,7 @@ from textwrap import dedent
 from agno.agent import Agent
 from agno.models.openai import OpenAIChat
 from agno.storage.agent.sqlite import SqliteAgentStorage
-from agno.tools import Tool
+from agno.tools import tool
 import os
 
 HR_DOCS_FOLDER = "playground/hr_docs"
@@ -33,7 +33,7 @@ def read_hr_documents() -> str:
 """
 
 # Agno tool wrapper for document reader
-read_hr_docs_tool = Tool.from_function(
+read_hr_docs_tool = tool.from_function(
     name="read_hr_documents",
     description="Loads all HR documents: FEEDBACK.txt, CLIENT_WORK.txt, and BOLD_GOALS.txt from the hr_docs folder.",
     func=read_hr_documents,
