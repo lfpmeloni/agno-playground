@@ -41,3 +41,7 @@ async def run_marketing_workflow(request: Request):
         """
     except Exception as e:
         return HTMLResponse(content=f"<h1>❌ Error</h1><pre>{str(e)}</pre>", status_code=500)
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("terminal_ui:app", host="0.0.0.0", port=8000, reload=True)
