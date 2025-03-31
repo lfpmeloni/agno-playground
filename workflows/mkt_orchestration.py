@@ -17,15 +17,14 @@ class PersonalizedMarketingWorkflow(Workflow):
     board_extractor: Agent = create_board_agent()
 
     # Step 2: Enrich board member interests
-    interest_enricher: Agent = create_bod_interests_agent
+    interest_enricher: Agent = create_bod_interests_agent()
 
     # Step 3: Content generation with Crowe insights
-    webpage_generator: Agent = create_content_generator_agent
+    webpage_generator: Agent = create_content_generator_agent()
 
     def run_workflow(self, ticker_or_name: str) -> RunResponse:
         logger.info(f"🎯 Starting workflow for {ticker_or_name}")
 
-        # Step 1: Get Board Members
         logger.info("🔍 Fetching Board Members from SEC...")
         board_response = self.board_extractor.run(ticker_or_name)
         names = board_response.content if isinstance(board_response.content, list) else []
@@ -46,3 +45,4 @@ class PersonalizedMarketingWorkflow(Workflow):
             content=final_page.content,
             event=RunEvent.workflow_completed
         )
+
