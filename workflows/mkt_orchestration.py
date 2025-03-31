@@ -3,9 +3,9 @@ from agno.run.response import RunResponse, RunEvent
 from agno.models.openai import OpenAIChat
 from agno.agent import Agent
 from agno.utils.log import logger
-from agents.mkt_board_of_directors import mkt_board_of_directors
-from agents.mkt_bod_interests import mkt_bod_interests
-from agents.mkt_content_generator import mkt_generate_webpage_agent
+from agents.mkt_board_of_directors import create_board_agent
+from agents.mkt_bod_interests import create_bod_interests_agent
+from agents.mkt_content_generator import create_content_generator_agent
 
 from typing import List
 from pydantic import BaseModel
@@ -14,13 +14,13 @@ class PersonalizedMarketingWorkflow(Workflow):
     description: str = "Generates a personalized insights webpage for Board Members of a given company based on SEC filings and Crowe.com articles."
 
     # Step 1: Get Board Members from SEC
-    board_extractor: Agent = mkt_board_of_directors
+    board_extractor: Agent = create_board_agent
 
     # Step 2: Enrich board member interests
-    interest_enricher: Agent = mkt_bod_interests
+    interest_enricher: Agent = create_bod_interests_agent
 
     # Step 3: Content generation with Crowe insights
-    webpage_generator: Agent = mkt_generate_webpage_agent
+    webpage_generator: Agent = create_content_generator_agent
 
     def run(self, ticker_or_name: str) -> RunResponse:
         logger.info(f"🎯 Starting workflow for {ticker_or_name}")
