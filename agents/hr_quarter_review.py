@@ -9,7 +9,9 @@ HR_DOCS_FOLDER = "playground/hr_docs"
 AGENT_DB_PATH = "tmp/agents.db"
 
 # Custom tool that loads and formats the review documents
+@tool
 def read_hr_documents() -> str:
+    """Loads all HR documents: FEEDBACK.txt, CLIENT_WORK.txt, and BOLD_GOALS.txt from the hr_docs folder."""
     def safe_read(file_name):
         path = os.path.join(HR_DOCS_FOLDER, file_name)
         if not os.path.isfile(path):
@@ -32,14 +34,6 @@ def read_hr_documents() -> str:
 {bold_goals}
 """
 
-# Agno tool wrapper for document reader
-read_hr_docs_tool = tool.from_function(
-    name="read_hr_documents",
-    description="Loads all HR documents: FEEDBACK.txt, CLIENT_WORK.txt, and BOLD_GOALS.txt from the hr_docs folder.",
-    func=read_hr_documents,
-    output_type="string"
-)
-
 # Create the agent
 def create_quarterly_review_agent():
     return Agent(
@@ -47,7 +41,7 @@ def create_quarterly_review_agent():
         agent_id="hr_quarterly_review",
         role="HR assistant that reviews quarterly performance based on feedback, client work, and yearly goals.",
         model=OpenAIChat("gpt-4o"),
-        tools=[read_hr_docs_tool],
+        tools=[read_hr_documents],
         instructions=dedent("""
             You are an HR assistant helping with quarterly performance reviews.
             Use the `read_hr_documents` tool to retrieve all necessary context.
