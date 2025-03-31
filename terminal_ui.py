@@ -18,7 +18,7 @@ async def run_marketing_workflow(request: Request):
 
         # Replace this with whatever default input you want to use
         ticker_or_company = "PEP"
-        response = workflow.run(ticker_or_company)
+        response = workflow.run_workflow(ticker_or_company)
 
         content = response.content if response and response.content else "No output generated."
 

@@ -22,7 +22,7 @@ class PersonalizedMarketingWorkflow(Workflow):
     # Step 3: Content generation with Crowe insights
     webpage_generator: Agent = create_content_generator_agent
 
-    def run(self, ticker_or_name: str) -> RunResponse:
+    def run_workflow(self, ticker_or_name: str) -> RunResponse:
         logger.info(f"🎯 Starting workflow for {ticker_or_name}")
 
         # Step 1: Get Board Members
