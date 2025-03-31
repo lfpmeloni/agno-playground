@@ -14,6 +14,7 @@ from agents.mkt_board_of_directors import create_board_agent
 from agents.mkt_bod_interests import create_bod_interests_agent
 from agents.mkt_content_generator import create_content_generator_agent
 from agents.mkt_marketing_agent import create_marketing_agent
+from agents.hr_quarter_review import create_quarterly_review_agent
 
 # Custom teams
 from teams.marketing_team import marketing_team
@@ -29,7 +30,8 @@ app = Playground(
         create_board_agent(),
         create_bod_interests_agent(),
         create_content_generator_agent(),
-        create_marketing_agent()
+        create_marketing_agent(),
+        create_quarterly_review_agent()
     ],
     teams=[
         marketing_team
