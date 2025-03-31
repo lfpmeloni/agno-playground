@@ -44,3 +44,13 @@ marketing_team = Team(
         mode="team"
     )
 )
+
+if __name__ == "__main__":
+    import asyncio
+    asyncio.run(
+        marketing_team.aprint_response(
+            message="Generate personalized insights webpages for PepsiCo board members.",
+            stream=True,
+            stream_intermediate_steps=True,
+        )
+    )
