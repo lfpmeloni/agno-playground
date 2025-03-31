@@ -14,7 +14,7 @@ class PersonalizedMarketingWorkflow(Workflow):
     description: str = "Generates a personalized insights webpage for Board Members of a given company based on SEC filings and Crowe.com articles."
 
     # Step 1: Get Board Members from SEC
-    board_extractor: Agent = create_board_agent
+    board_extractor: Agent = create_board_agent()
 
     # Step 2: Enrich board member interests
     interest_enricher: Agent = create_bod_interests_agent
