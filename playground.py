@@ -19,8 +19,23 @@ from agents.hr_quarter_review import create_quarterly_review_agent
 # Custom teams
 from teams.marketing_team import marketing_team
 
+# Custom workflows
+from workflows.mkt_orchestration import PersonalizedMarketingWorkflow
+from agno.storage.sqlite import SqliteStorage
+
 # SQLite path
 agent_storage = "tmp/agents.db"
+
+workflow_storage = SqliteStorage(
+    table_name="mkt_orchestration_workflow",
+    db_file="tmp/agno_workflows.db"
+)
+
+mkt_workflow = PersonalizedMarketingWorkflow(
+    workflow_id="marketing-orchestration-workflow",
+    storage=workflow_storage
+)
+
 
 # Playground app definition
 app = Playground(
@@ -35,6 +50,9 @@ app = Playground(
     ],
     teams=[
         marketing_team
+    ],
+    workflows=[
+        mkt_workflow
     ]
 ).get_app()
 
