@@ -2,7 +2,7 @@ from textwrap import dedent
 from agno.agent import Agent
 from agno.models.openai import OpenAIChat
 from agno.storage.agent.sqlite import SqliteAgentStorage
-from agno.tools.tool import Tool
+from agno.tools import Tool
 import os
 
 HR_DOCS_FOLDER = "playground/hr_docs"
