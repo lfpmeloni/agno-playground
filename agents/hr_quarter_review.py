@@ -5,7 +5,7 @@ from agno.storage.agent.sqlite import SqliteAgentStorage
 from agno.tools import tool
 import os
 
-HR_DOCS_FOLDER = "playground/hr_docs"
+HR_DOCS_FOLDER = os.path.abspath(os.path.join(os.path.dirname(__file__), "../hr_docs"))
 AGENT_DB_PATH = "tmp/agents.db"
 
 # Custom tool that loads and formats the review documents
