@@ -2,46 +2,67 @@ from textwrap import dedent
 from agno.agent import Agent
 from agno.models.openai import OpenAIChat
 from agno.storage.agent.sqlite import SqliteAgentStorage
+from agno.tools.tool import Tool
+import os
 
-# Paths
 HR_DOCS_FOLDER = "playground/hr_docs"
 AGENT_DB_PATH = "tmp/agents.db"
 
+# Custom tool that loads and formats the review documents
+def read_hr_documents() -> str:
+    def safe_read(file_name):
+        path = os.path.join(HR_DOCS_FOLDER, file_name)
+        if not os.path.isfile(path):
+            return f"{file_name} not found.\n"
+        with open(path, "r") as f:
+            return f.read()
+
+    feedback = safe_read("FEEDBACK.txt")
+    client_work = safe_read("CLIENT_WORK.txt")
+    bold_goals = safe_read("BOLD_GOALS.txt")
+
+    return f"""
+--- FEEDBACK ---
+{feedback}
+
+--- CLIENT WORK ---
+{client_work}
+
+--- BOLD GOALS ---
+{bold_goals}
+"""
+
+# Agno tool wrapper for document reader
+read_hr_docs_tool = Tool.from_function(
+    name="read_hr_documents",
+    description="Loads all HR documents: FEEDBACK.txt, CLIENT_WORK.txt, and BOLD_GOALS.txt from the hr_docs folder.",
+    func=read_hr_documents,
+    output_type="string"
+)
+
+# Create the agent
 def create_quarterly_review_agent():
     return Agent(
         name="Quarterly Review Agent",
         agent_id="hr_quarterly_review",
-        role="HR assistant reviewing employee performance based on feedback, client work, and yearly goals.",
+        role="HR assistant that reviews quarterly performance based on feedback, client work, and yearly goals.",
         model=OpenAIChat("gpt-4o"),
+        tools=[read_hr_docs_tool],
         instructions=dedent("""
-            You are an HR assistant that helps with quarterly employee performance reviews.
-            Your role is to:
-            1. Read the feedback received by the employee.
-            2. Analyze the documented client work.
-            3. Match both to the BOLD_GOALS of the employee.
-            4. Summarize how the employee’s actions and received feedback align with their yearly goals.
-
-            You'll be provided with three sections: FEEDBACK, CLIENT_WORK, and BOLD_GOALS. Review each and produce a structured summary that discusses:
-            - Strengths and progress made towards goals.
-            - Any noted gaps or opportunities for improvement.
-            - Specific quotes or accomplishments aligned with goals.
+            You are an HR assistant helping with quarterly performance reviews.
+            Use the `read_hr_documents` tool to retrieve all necessary context.
+            Then analyze and summarize how the feedback and client work align with the BOLD_GOALS.
+            Your summary should:
+            - Mention strengths and progress
+            - Highlight gaps or areas for improvement
+            - Reference specific quotes or examples
         """),
         markdown=True,
-        show_tool_calls=False,
+        show_tool_calls=True,
         add_history_to_messages=False,
         add_datetime_to_instructions=True,
         storage=SqliteAgentStorage(
             table_name="hr_quarterly_review",
             db_file=AGENT_DB_PATH
-        ),
-        input_template=dedent("""
-            --- FEEDBACK ---
-            {feedback}
-
-            --- CLIENT WORK ---
-            {client_work}
-
-            --- BOLD GOALS ---
-            {bold_goals}
-        """)
+        )
     )
