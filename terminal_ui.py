@@ -6,7 +6,7 @@ from agno.storage.sqlite import SqliteStorage
 app = FastAPI()
 
 @app.get("/run-marketing", response_class=HTMLResponse)
-async def run_marketing_workflow(request: Request):
+async def run_marketing_workflow(request: Request, ticker: str = "PEP"):
     try:
         workflow = PersonalizedMarketingWorkflow(
             workflow_id="marketing-orchestration-ui",
@@ -16,10 +16,7 @@ async def run_marketing_workflow(request: Request):
             )
         )
 
-        # Replace this with whatever default input you want to use
-        ticker_or_company = "PEP"
-        response = workflow.run_workflow(ticker_or_company)
-
+        response = workflow.run_workflow(ticker)
         content = response.content if response and response.content else "No output generated."
 
         return f"""
@@ -28,14 +25,20 @@ async def run_marketing_workflow(request: Request):
                 <title>Marketing Workflow Output</title>
                 <style>
                     body {{ font-family: monospace; padding: 20px; background: #111; color: #0f0; }}
+                    input[type='text'] {{ padding: 4px; font-size: 14px; }}
+                    button {{ margin-left: 10px; padding: 4px 10px; }}
                     pre {{ white-space: pre-wrap; word-wrap: break-word; }}
                     a {{ color: cyan; }}
                 </style>
             </head>
             <body>
-                <h1>📄 Workflow Output for <code>{ticker_or_company}</code></h1>
+                <h1>📄 Workflow Output for <code>{ticker}</code></h1>
+                <form method="get" action="/run-marketing">
+                    <label>Enter ticker: </label>
+                    <input type="text" name="ticker" value="{ticker}" />
+                    <button type="submit">▶️ Run</button>
+                </form>
                 <pre>{content}</pre>
-                <br><a href="/run-marketing">🔁 Run again</a>
             </body>
         </html>
         """
