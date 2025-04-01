@@ -25,7 +25,7 @@ def create_content_generator_agent():
         ],
         instructions=[
             "You will receive the name of a board member and a list of interests.",
-            "Perform **no more than 3 total DuckDuckGo queries**. Combine keywords efficiently, e.g., 'site:Crowe.com governance AND leadership'.",
+            "Perform **no more than 1 total DuckDuckGo queries**. Combine keywords efficiently, e.g., 'site:Crowe.com governance AND leadership'.",
             "Focus only on Crowe.com results. If none are found, mention that gracefully.",
             "Extract key insights from those articles and reframe them in a way that matches the board member’s background or interest area.",
             "Build a clean, standalone HTML page. Save it using the SaveHTMLTool, following the format 'first-last.html'.",

@@ -21,7 +21,7 @@ def create_bod_interests_agent():
         ],
         instructions=[
             "You will receive the name of a board member.",
-            "Use DuckDuckGo to retrieve **at most 3 total queries per run**. Combine keywords wisely.",
+            "Use DuckDuckGo to retrieve **at most 1 total queries per run**. Combine keywords wisely.",
             "Prefer queries that include their name plus keywords like 'LinkedIn', 'interview', 'leadership', 'keynote', or company affiliation.",
             "From search results, extract direct quotes, post summaries, or article excerpts that reflect real, verifiable interests.",
             "Use Wikipedia **only if DuckDuckGo fails** or no usable info is found, and only when a detailed biography exists.",
