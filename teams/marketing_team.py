@@ -30,6 +30,7 @@ marketing_team = Team(
         "Your job is to coordinate the team to retrieve the board of directors, identify interests, and generate a personalized insights page for one board member.",
         "Use only 1 search query per agent. If search tools fail, fallback to inferring based on titles and roles.",
         f"All final pages must be saved using SaveHTMLTool and served at: {PUBLIC_HTML_BASE_URL}/<filename>.html",
+        "The page must contain real, personalized content derived from web search. Do not return placeholder templates."
         "The final response should include the board member's name and the public link to their page.",
     ],
     success_criteria=(
