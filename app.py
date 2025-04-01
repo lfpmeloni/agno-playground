@@ -1,7 +1,9 @@
 from flask import Flask, render_template, request, redirect, url_for, render_template_string
 import threading
+import io
 import uuid
 import asyncio
+from contextlib import redirect_stdout
 from teams.marketing_team import get_marketing_team
 
 app = Flask(__name__)
@@ -11,25 +13,32 @@ outputs = {}
 running_jobs = set()
 team_instance = get_marketing_team()
 
-# Async function to run agent and stream output to terminal + store
 async def run_team_agent(prompt, job_id):
     outputs[job_id] = "🔁 Task started...\n"
 
+    f = io.StringIO()
+
     async def stream_output(chunk):
-        print(chunk, end="", flush=True)
+        # Also capture what Agno gives directly
         outputs[job_id] += chunk
 
     try:
         print(f"\n🔁 Running marketing_team with job_id: {job_id}\n")
-        await team_instance.aprint_response(
-            message=prompt,
-            stream=True,
-            stream_intermediate_steps=True,
-            callback=stream_output
-        )
+        running_jobs.add(job_id)
+
+        with redirect_stdout(f):  # Capture everything printed to terminal
+            await team_instance.aprint_response(
+                message=prompt,
+                stream=True,
+                stream_intermediate_steps=True,
+                callback=stream_output
+            )
+
+        # Append captured stdout after the agent finishes
+        outputs[job_id] += f.getvalue()
         outputs[job_id] += "\n✅ Task completed successfully.\n"
+
     except Exception as e:
-        print(f"❌ Error in job {job_id}: {e}")
         outputs[job_id] += f"\n❌ Error: {e}"
     finally:
         running_jobs.discard(job_id)
