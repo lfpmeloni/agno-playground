@@ -4,7 +4,7 @@ import uuid
 import asyncio
 import sys
 
-from teams.marketing_team import marketing_team
+from teams.marketing_team import get_marketing_team
 
 app = Flask(__name__)
 
@@ -21,7 +21,7 @@ async def run_team_agent(prompt, job_id):
 
     try:
         print(f"\n🔁 Running marketing_team with job_id: {job_id}\n")
-        await marketing_team.aprint_response(
+        await get_marketing_team.aprint_response(
             message=prompt,
             stream=True,
             stream_intermediate_steps=True,
