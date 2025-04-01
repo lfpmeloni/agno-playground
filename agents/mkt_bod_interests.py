@@ -20,12 +20,14 @@ def create_bod_interests_agent():
             PythonTools()
         ],
         instructions=[
-            "Use DuckDuckGo to retrieve at least 10 search results related to the person's LinkedIn profile and public posts.",
-            "From those, extract *specific quotes, post summaries, or article snippets* that reflect what this person is interested in — e.g. innovation, healthcare, education, policy, etc.",
-            "Clearly list inferred interests based on evidence from their activities or writings.",
-            "Use Wikipedia only if a detailed biography exists. Label your findings as [LinkedIn], [Wikipedia], or [Other].",
-            "DO NOT invent information. Use ONLY verifiable content. Always include source URLs.",
-            "Conclude with a bullet list of verified interests."
+            "You will receive the name of a board member.",
+            "Use DuckDuckGo to retrieve at most **3 queries total** (not more than 3 tool calls). Choose your queries wisely.",
+            "Prioritize searches for LinkedIn, recent interviews, or thought leadership articles.",
+            "From those results, extract *specific quotes, post summaries, or article snippets* that reflect what this person is interested in — e.g. innovation, healthcare, education, policy, etc.",
+            "Use Wikipedia only if a detailed biography exists and DuckDuckGo yields little or no useful information.",
+            "Label each finding with [DuckDuckGo], [Wikipedia], or [Other] and include source URLs.",
+            "DO NOT invent information. Use ONLY verifiable content.",
+            "Conclude with a bullet list of verified or strongly inferred interests based on retrieved data."
         ],
         show_tool_calls=True,
         markdown=True,
