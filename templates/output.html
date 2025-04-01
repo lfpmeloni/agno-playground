@@ -14,8 +14,12 @@
         border: 1px solid #ccc;
         padding: 1rem;
         white-space: pre-wrap;
-        overflow-wrap: break-word;
+        word-break: break-word;
         border-radius: 5px;
+      }
+      a {
+        color: #1a0dab;
+        text-decoration: underline;
       }
     </style>
     <script>
@@ -28,7 +32,20 @@
         .then(response => response.text())
         .then(text => {
           const outputDiv = document.getElementById("output");
-          outputDiv.textContent = text;
+
+          // Escape HTML first
+          let safeText = text
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;");
+
+          // Convert raw URLs into clickable links
+          safeText = safeText.replace(
+            /(https?:\/\/[^\s]+)/g,
+            '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'
+          );
+
+          outputDiv.innerHTML = safeText;
 
           if (!text.includes("🏁 Job finished.") && !text.includes("❌ Error")) {
             setTimeout(fetchStatus, 2000); // keep polling
