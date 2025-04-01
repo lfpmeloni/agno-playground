@@ -19,30 +19,32 @@
       }
     </style>
     <script>
-        function fetchStatus() {
+      function fetchStatus() {
         fetch("/status/{{ job_id }}", {
-            headers: {
+          headers: {
             "X-Requested-With": "XMLHttpRequest"
-            }
+          }
         })
         .then(response => response.text())
         .then(html => {
-            const outputDiv = document.getElementById("output");
-            outputDiv.innerHTML = html;
-    
-            if (!html.includes("🏁 Job finished.") && !html.includes("❌ Error")) {
+          const outputDiv = document.getElementById("output");
+          outputDiv.innerHTML = "";
+          const pre = document.createElement("pre");
+          pre.textContent = html;
+          outputDiv.appendChild(pre);
+
+          if (!html.includes("🏁 Job finished.") && !html.includes("❌ Error")) {
             setTimeout(fetchStatus, 2000);  // Keep polling
-            }
+          }
         })
         .catch(error => {
-            document.getElementById("output").innerText = "⚠️ Error fetching agent output.";
-            console.error(error);
+          document.getElementById("output").innerText = "⚠️ Error fetching agent output.";
+          console.error(error);
         });
-        }
-    
-        window.onload = fetchStatus;
+      }
+
+      window.onload = fetchStatus;
     </script>
-  
   </head>
   <body>
     <h1>Marketing Team Execution Output</h1>
