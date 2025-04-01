@@ -15,7 +15,7 @@ PUBLIC_HTML_BASE_URL = "http://172.178.45.177:8080"
 # Define the full team as a coordinator
 marketing_team = Team(
     name="Marketing Team",
-    team_id="marketing_team",  # used for logs and reuse, not for Agent UI yet
+    team_id="marketing_team",  # used for logs and reuse
     description="End-to-end pipeline: fetch board members, extract interests, and generate personalized pages.",
     model=OpenAIChat("gpt-4o"),
     mode="coordinate",  # Team leader delegates work and aggregates output
@@ -25,17 +25,22 @@ marketing_team = Team(
         create_content_generator_agent(),
     ],
     instructions=[
-        "You are the leader of a marketing automation team.",
+        "You are the leader of a marketing automation team tasked with generating Crowe.com-style insights pages for board members.",
         "You will receive a company name (e.g., 'PepsiCo').",
-        "First, use the Board Agent to fetch the board of directors.",
-        "For ONLY THE LAST board member, call the Interest Agent to determine key interests.",
-        "Avoid using Wikipedia unless absolutely necessary. Use DuckDuckGo sparingly—at most 1 query per member per agent.",
-        "If DuckDuckGo fails or rate limits, fallback to general inference from the board member name and title.",
-        "Then, call the Content Generator Agent to create a Crowe.com-style personalized insights page.",
-        f"Ensure the pages are saved using the SaveHTMLTool and indexed at: {PUBLIC_HTML_BASE_URL}/<name>.html",
-        "Finish with a summary and confirmation message.",
+        "Step 1: Call the Board Agent to fetch the board of directors using the SEC API.",
+        "Step 2: Focus ONLY on the LAST board member returned. Pass their name and title to the Interest Agent.",
+        "Step 3: The Interest Agent must identify the person’s likely professional interests.",
+        "⚠️ Limit DuckDuckGo usage to a SINGLE query per agent per person. Combine all inferred interest areas into one query.",
+        "⚠️ If DuckDuckGo fails or is unavailable, fallback to inferring interests from the person’s title and background.",
+        "Step 4: Call the Content Generator Agent with a SINGLE combined search term string (e.g., 'healthcare finance governance').",
+        f"Use only one DuckDuckGo search with the format: site:Crowe.com <combined-interests>",
+        f"Ensure that each page is saved using SaveHTMLTool and made accessible via: {PUBLIC_HTML_BASE_URL}/<filename>.html",
+        "Return a final summary listing the board member's name and the public URL of the generated page.",
     ],
-    success_criteria="All board members have personalized pages created and saved. A summary is returned with all links.",
+    success_criteria=(
+        "The insights page for the last board member is created, saved, and publicly accessible. "
+        "Summary includes the final link."
+    ),
     enable_agentic_context=True,
     show_tool_calls=True,
     show_members_responses=True,
