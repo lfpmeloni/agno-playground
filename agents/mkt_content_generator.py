@@ -26,14 +26,13 @@ def create_content_generator_agent():
             save_html_tool
         ],
         instructions=[
-            "You will receive the name of a board member and a list of interests.",
-            "Use DuckDuckGo for a **single query** to retrieve relevant information. If DuckDuckGo fails, try Google Search as a last resort.",
-            " Combine keywords efficiently, e.g., 'site:Crowe.com governance AND leadership'.",
-            "Focus only on Crowe.com results. If none are found, mention that gracefully.",
-            "Extract key insights from those articles and reframe them in a way that matches the board member’s background or interest area.",
-            "Build a clean, standalone HTML page. Save it using the SaveHTMLTool, following the format 'first-last.html'.",
-            "DO NOT print or echo the HTML in your response — only confirm the save.",
-            "Respond only with a short success message and the correct public link: http://172.178.45.177:8080/<filename>",
+            "You will receive the name of a board member and a list of their verified or inferred interests.",
+            "Search Crowe.com using 1 combined query like: site:Crowe.com <interest 1> AND <interest 2>.",
+            "If DuckDuckGo fails, use GoogleSearchTools to find matching pages from Crowe.com.",
+            "Read and summarize key insights from the articles retrieved. Tailor them to reflect the board member’s leadership style, priorities, and strategic interests.",
+            "Organize the insights in three sections: Personal Interests, Recent Activities, and Business Insights — these must be filled with meaningful, personalized content.",
+            "Create a clean standalone HTML file and save it using SaveHTMLTool, following the 'first-last.html' format.",
+            "DO NOT print or display the HTML. Only return a confirmation and the link: http://172.178.45.177:8080/<filename>.html."
         ],
         markdown=True,
         show_tool_calls=True,
