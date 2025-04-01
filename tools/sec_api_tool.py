@@ -1,20 +1,18 @@
 from agno.tools import tool
 from dotenv import load_dotenv
 import os
-import requests
-
-from tools.wrappers import ToolResult  # Make sure this import path matches your project
 
 @tool
-def get_board_of_directors(ticker: str) -> ToolResult:
+def get_board_of_directors(ticker: str) -> str:
     """
     Retrieve board of directors for a given company ticker using SEC API.
     """
+    import os, requests
     load_dotenv()
 
     api_key = os.getenv("SEC_API_KEY")
     if not api_key:
-        return ToolResult("SEC_API_KEY not found in environment.")
+        return "❌ SEC_API_KEY not found in environment."
 
     url = f"https://api.sec-api.io/directors-and-board-members?token={api_key}"
     headers = {"Content-Type": "application/json"}
@@ -25,21 +23,16 @@ def get_board_of_directors(ticker: str) -> ToolResult:
         "sort": [{"filedAt": {"order": "desc"}}]
     }
 
-    try:
-        response = requests.post(url, json=payload, headers=headers)
-        response.raise_for_status()
-    except requests.RequestException as e:
-        return ToolResult(f"API error: {e}")
+    response = requests.post(url, json=payload, headers=headers)
+    if response.status_code != 200:
+        return f"❌ API error: {response.status_code} - {response.text}"
 
     data = response.json().get("data", [])
     if not data:
-        return ToolResult(f"No board members found for {ticker}.")
+        return f"ℹ️ No board members found for {ticker}."
 
     output = f"Board of Directors for {ticker}:\n\n"
     for entry in data:
         for director in entry.get("directors", []):
-            name = director.get("name", "N/A")
-            position = director.get("position", "N/A")
-            output += f"• {name} - {position}\n"
-
-    return ToolResult(output)
+            output += f"• {director.get('name', 'Unknown')} - {director.get('position', 'N/A')}\n"
+    return output  # ← this is important: return a plain string
