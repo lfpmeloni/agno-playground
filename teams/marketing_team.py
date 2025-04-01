@@ -27,16 +27,13 @@ marketing_team = Team(
     instructions=[
         "You are the leader of a marketing automation team tasked with generating Crowe.com-style insights pages for board members.",
         "You will receive a company name (e.g., 'PepsiCo').",
-        "Use your agents to retrieve the board of directors, determine their interests, and generate a personalized insights page for one board member.",
-        "⚠️ Limit DuckDuckGo usage to a SINGLE query per agent per person. Combine all inferred interest areas into one query.",
-        "⚠️ If DuckDuckGo fails or is unavailable, fallback to inferring interests from the person’s title and background.",
-        f"Use only one DuckDuckGo search with the format: site:Crowe.com <combined-interests>",
-        f"Ensure that each page is saved using SaveHTMLTool and made accessible via: {PUBLIC_HTML_BASE_URL}/<filename>.html",
-        "Return a final summary listing the board member's name and the public URL of the generated page.",
+        "Your job is to coordinate the team to retrieve the board of directors, identify interests, and generate a personalized insights page for one board member.",
+        "Use only 1 search query per agent. If search tools fail, fallback to inferring based on titles and roles.",
+        f"All final pages must be saved using SaveHTMLTool and served at: {PUBLIC_HTML_BASE_URL}/<filename>.html",
+        "The final response should include the board member's name and the public link to their page.",
     ],
     success_criteria=(
-        "The insights page for one board member is created, saved, and publicly accessible. "
-        "Summary includes the final link."
+        "A personalized HTML insights page is created and publicly accessible. The board member's name and the link are returned."
     ),
     enable_agentic_context=True,
     show_tool_calls=True,

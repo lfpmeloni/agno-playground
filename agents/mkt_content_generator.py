@@ -2,6 +2,8 @@ from agno.agent import Agent
 from agno.models.openai import OpenAIChat
 from agno.storage.agent.sqlite import SqliteAgentStorage
 from agno.tools.duckduckgo import DuckDuckGoTools
+from agno.tools.googlesearch import GoogleSearchTools
+from agno.tools.tavily import TavilyTools
 from agno.tools.python import PythonTools
 
 from tools.save_html_tool import save_html_tool
@@ -20,12 +22,15 @@ def create_content_generator_agent():
         model=OpenAIChat(id="gpt-4o"),
         tools=[
             DuckDuckGoTools(),
+            GoogleSearchTools(),
+            TavilyTools(),
             PythonTools(),
             save_html_tool
         ],
         instructions=[
             "You will receive the name of a board member and a list of interests.",
-            "Perform **no more than 1 total DuckDuckGo queries**. Combine keywords efficiently, e.g., 'site:Crowe.com governance AND leadership'.",
+            "Use DuckDuckGo for a **single query** to retrieve relevant information. If DuckDuckGo fails, try Google Search, and then Tavily as a last resort.",
+            " Combine keywords efficiently, e.g., 'site:Crowe.com governance AND leadership'.",
             "Focus only on Crowe.com results. If none are found, mention that gracefully.",
             "Extract key insights from those articles and reframe them in a way that matches the board member’s background or interest area.",
             "Build a clean, standalone HTML page. Save it using the SaveHTMLTool, following the format 'first-last.html'.",
