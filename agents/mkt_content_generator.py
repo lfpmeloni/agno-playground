@@ -1,9 +1,9 @@
 from agno.agent import Agent
 from agno.models.openai import OpenAIChat
 from agno.storage.agent.sqlite import SqliteAgentStorage
+from agno.tools.duckduckgo import DuckDuckGoTools
 from agno.tools.python import PythonTools
 
-from tools.limited_duckduckgo import LimitedDuckDuckGo
 from tools.save_html_tool import save_html_tool
 import os
 
@@ -19,7 +19,7 @@ def create_content_generator_agent():
         ),
         model=OpenAIChat(id="gpt-4o"),
         tools=[
-            LimitedDuckDuckGo(max_calls=3).get_tool(),
+            DuckDuckGoTools(),
             PythonTools(),
             save_html_tool
         ],

@@ -2,9 +2,9 @@ from agno.agent import Agent
 from agno.models.openai import OpenAIChat
 from agno.storage.agent.sqlite import SqliteAgentStorage
 
+from agno.tools.duckduckgo import DuckDuckGoTools
 from agno.tools.wikipedia import WikipediaTools
 from agno.tools.python import PythonTools
-from tools.limited_duckduckgo import LimitedDuckDuckGo
 
 def create_bod_interests_agent():
     return Agent(
@@ -15,7 +15,7 @@ def create_bod_interests_agent():
         ),
         model=OpenAIChat(id="gpt-4o"),
         tools=[
-            LimitedDuckDuckGo(max_calls=3).get_tool(),
+            DuckDuckGoTools(),
             WikipediaTools(),
             PythonTools()
         ],
