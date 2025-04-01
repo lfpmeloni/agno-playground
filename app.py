@@ -13,10 +13,10 @@ team_instance = get_marketing_team()
 
 # Async function to run agent and stream output to terminal + store
 async def run_team_agent(prompt, job_id):
-    outputs[job_id] = "Task started...\n"
+    outputs[job_id] = "🔁 Task started...\n"
 
     async def stream_output(chunk):
-        print(chunk, end="", flush=True)  # Print to terminal in real-time
+        print(chunk, end="", flush=True)
         outputs[job_id] += chunk
 
     try:
@@ -27,12 +27,13 @@ async def run_team_agent(prompt, job_id):
             stream_intermediate_steps=True,
             callback=stream_output
         )
-        outputs[job_id] += "\n✅ Done!"
+        outputs[job_id] += "\n✅ Task completed successfully.\n"
     except Exception as e:
         print(f"❌ Error in job {job_id}: {e}")
         outputs[job_id] += f"\n❌ Error: {e}"
     finally:
         running_jobs.discard(job_id)
+        outputs[job_id] += "\n🏁 Job finished.\n"
 
 # Route to submit job and start background async task
 @app.route('/', methods=['GET', 'POST'])
@@ -59,7 +60,14 @@ def index():
 @app.route('/status/<job_id>')
 def check_status(job_id):
     output = outputs.get(job_id)
-    return render_template('output.html', job_id=job_id, output=output or "<p><em>Still running...</em></p>", dark_mode=True)
+    done = output and ("✅ Task completed" in output or "❌ Error" in output or "🏁 Job finished." in output)
+    return render_template(
+        'output.html',
+        job_id=job_id,
+        output=output or "<p><em>Still running...</em></p>",
+        dark_mode=True,
+        done=done
+    )
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000)

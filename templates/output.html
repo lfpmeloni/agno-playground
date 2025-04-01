@@ -4,17 +4,45 @@
     <meta charset="utf-8">
     <title>Agent Output</title>
     <script>
-        setInterval(function () {
-          fetch(`/status/{{ job_id }}`)
-            .then(response => response.text())
-            .then(html => {
-              document.getElementById("output").innerHTML = html;
-            });
-        }, 2000);
-      </script>
+      let polling = true;
+
+      function fetchOutput() {
+        if (!polling) return;
+
+        fetch(`/status/{{ job_id }}`)
+          .then(response => response.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const outputDiv = doc.getElementById("output");
+            const done = doc.getElementById("done-flag");
+
+            document.getElementById("output").innerHTML = outputDiv.innerHTML;
+
+            if (done) {
+              polling = false;
+              clearInterval(pollingInterval);
+              document.getElementById("done-message").style.display = "block";
+            }
+          });
+      }
+
+      const pollingInterval = setInterval(fetchOutput, 2000);
+    </script>
   </head>
   <body>
     <h1>Marketing Team Execution Output</h1>
-    <div id="output"><em>Running...</em></div>
+
+    <div id="output">
+      {{ output|safe }}
+      {% if done %}
+        <span id="done-flag" style="display: none;"></span>
+      {% endif %}
+    </div>
+
+    <div id="done-message" style="display: none; margin-top: 20px;">
+      <p style="color: green;"><strong>✅ Done!</strong></p>
+      <a href="/">⬅️ Back to Home</a>
+    </div>
   </body>
 </html>
