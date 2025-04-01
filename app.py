@@ -2,24 +2,17 @@ from flask import Flask, render_template, request, redirect, url_for
 import threading
 import uuid
 import asyncio
-import sys
-
 from teams.marketing_team import get_marketing_team
 
 app = Flask(__name__)
 
-# Store running output and active jobs
+# Store running output and job status
 outputs = {}
 running_jobs = set()
 team_instance = get_marketing_team()
 
 # Async function to run agent and stream output to terminal + store
 async def run_team_agent(prompt, job_id):
-    if job_id in running_jobs:
-        print(f"⚠️ Job {job_id} already running. Skipping duplicate launch.")
-        return
-
-    running_jobs.add(job_id)
     outputs[job_id] = "Task started...\n"
 
     async def stream_output(chunk):
@@ -39,7 +32,7 @@ async def run_team_agent(prompt, job_id):
         print(f"❌ Error in job {job_id}: {e}")
         outputs[job_id] += f"\n❌ Error: {e}"
     finally:
-        running_jobs.remove(job_id)
+        running_jobs.discard(job_id)
 
 # Route to submit job and start background async task
 @app.route('/', methods=['GET', 'POST'])
@@ -48,7 +41,11 @@ def index():
         prompt = request.form['prompt']
         job_id = str(uuid.uuid4())
 
-        # Launch async job in a background thread
+        if job_id in running_jobs:
+            return redirect(url_for('check_status', job_id=job_id))
+
+        running_jobs.add(job_id)
+
         def start_async_task():
             asyncio.run(run_team_agent(prompt, job_id))
 
