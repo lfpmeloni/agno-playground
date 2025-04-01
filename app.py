@@ -24,8 +24,8 @@ async def run_team_agent(prompt, job_id):
     async def stream_output(chunk):
         # Also capture what Agno gives directly
         print(chunk, end="", flush=True)
-        clean_chunk = ansi_escape.sub('', chunk)
-        outputs[job_id] += clean_chunk
+        clean_stdout = ansi_escape.sub('', f.getvalue())
+        outputs[job_id] += clean_stdout
 
     try:
         print(f"\n🔁 Running marketing_team with job_id: {job_id}\n")
