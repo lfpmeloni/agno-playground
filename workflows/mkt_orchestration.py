@@ -7,6 +7,7 @@ from agents.mkt_board_of_directors import create_board_agent
 from agents.mkt_bod_interests import create_bod_interests_agent
 from agents.mkt_content_generator import create_content_generator_agent
 
+import argparse
 from typing import List
 from pydantic import BaseModel
 
@@ -46,3 +47,22 @@ class PersonalizedMarketingWorkflow(Workflow):
             event=RunEvent.workflow_completed
         )
 
+# Run from terminal
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Run Personalized Marketing Workflow")
+    parser.add_argument(
+        "--ticker",
+        type=str,
+        default="PEP",
+        help="Company ticker or name (e.g., PEP, PepsiCo)"
+    )
+    args = parser.parse_args()
+
+    workflow = PersonalizedMarketingWorkflow(
+        workflow_id="mkt-orchestration-cli",
+        storage=None  # Add SqliteStorage if you want persistence
+    )
+
+    result = workflow.run_workflow(args.ticker)
+    print("\n✅ Final Output:\n")
+    print(result.content or "⚠️ No output generated.")
