@@ -1,56 +1,71 @@
-from textwrap import dedent
-from agno.models.openai import OpenAIChat
-from agno.team.team import Team
-from agno.storage.agent.sqlite import SqliteAgentStorage
+import sys
+import argparse
+import asyncio
+import os
 
-# Custom agents used as team members
+from agno.workflow import Workflow
+from agno.models.openai import OpenAIChat
+from agno.utils.log import logger
+from agno.storage.sqlite import SqliteStorage
+
 from agents.mkt_board_of_directors import create_board_agent
 from agents.mkt_bod_interests import create_bod_interests_agent
 from agents.mkt_content_generator import create_content_generator_agent
 
-# Storage and base URL
-agent_storage = "tmp/agents.db"
-PUBLIC_HTML_BASE_URL = "http://172.178.45.177:8080"
+from agno.agent import Agent
+from agno.run.response import RunResponse, RunEvent
 
-# Define the full team as a coordinator
-marketing_team = Team(
-    name="Marketing Team",
-    team_id="marketing_team",  # used for logs and reuse, not for Agent UI yet
-    description="End-to-end pipeline: fetch board members, extract interests, and generate personalized pages.",
-    model=OpenAIChat("gpt-4o"),
-    mode="coordinate",  # Team leader delegates work and aggregates output
-    members=[
-        create_board_agent(),
-        create_bod_interests_agent(),
-        create_content_generator_agent(),
-    ],
-    instructions=[
-        "You are the leader of a marketing automation team.",
-        "You will receive a company name (e.g., 'PepsiCo').",
-        "First, use the Board Agent to fetch the board of directors.",
-        "For each board member, call the Interest Agent to determine key interests.",
-        "Then, call the Content Generator Agent to create a Crowe.com-style personalized insights page.",
-        f"Ensure all pages are saved using the SaveHTMLTool and indexed at: {PUBLIC_HTML_BASE_URL}/<name>.html",
-        "Finish with a summary and confirmation message.",
-    ],
-    success_criteria="All board members have personalized pages created and saved. A summary is returned with all links.",
-    enable_agentic_context=True,
-    show_tool_calls=True,
-    show_members_responses=True,
-    markdown=True,
-    storage=SqliteAgentStorage(
-        table_name="marketing_team",
-        db_file=agent_storage,
-        mode="team"
-    )
-)
+class PersonalizedMarketingWorkflow(Workflow):
+    description: str = "Generates a personalized insights webpage for Board Members of a given company based on SEC filings and Crowe.com articles."
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.board_extractor: Agent = create_board_agent()
+        self.interest_enricher: Agent = create_bod_interests_agent()
+        self.webpage_generator: Agent = create_content_generator_agent()
+
+    async def run_workflow(self, ticker_or_name: str) -> RunResponse:
+        logger.info(f"🎯 Starting workflow for {ticker_or_name}")
+
+        logger.info("🔍 Fetching Board Members from SEC...")
+        board_response = await self.board_extractor.arun(ticker_or_name)
+        names = board_response.content if isinstance(board_response.content, list) else []
+
+        all_interests = []
+        for name in names:
+            logger.info(f"🎯 Finding interests for {name}")
+            interests_response = await self.interest_enricher.arun(name)
+            all_interests.append({
+                "name": name,
+                "interests": interests_response.content
+            })
+
+        logger.info(f"🧠 Generating personalized marketing page with Crowe insights...")
+        final_page = await self.webpage_generator.arun(all_interests)
+
+        return RunResponse(
+            content=final_page.content,
+            event=RunEvent.workflow_completed
+        )
 
 if __name__ == "__main__":
-    import asyncio
-    asyncio.run(
-        marketing_team.aprint_response(
-            message="Generate personalized insights webpages for PepsiCo board members.",
-            stream=True,
-            stream_intermediate_steps=True,
+    parser = argparse.ArgumentParser(description="Run Personalized Marketing Workflow")
+    parser.add_argument(
+        "--ticker",
+        type=str,
+        default="PEP",
+        help="Company ticker or name (e.g., PEP, PepsiCo)"
+    )
+    args = parser.parse_args()
+
+    workflow = PersonalizedMarketingWorkflow(
+        workflow_id="mkt-orchestration-cli",
+        storage=SqliteStorage(
+            table_name="mkt_orchestration_workflow",
+            db_file="tmp/agno_workflows.db"
         )
     )
+
+    result = asyncio.run(workflow.run_workflow(args.ticker))
+    print("\n✅ Final Output:\n")
+    print(result.content or "⚠️ No output generated.")
