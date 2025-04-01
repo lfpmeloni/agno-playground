@@ -1,45 +1,17 @@
-from agno.tools import tool
-from dotenv import load_dotenv
-import os
-import requests
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+from agno.storage.agent.sqlite import SqliteAgentStorage
+from tools.sec_api_tool import get_board_of_directors
 
-from tools.wrappers import ToolResult  # Make sure this import path matches your project
-
-@tool
-def get_board_of_directors(ticker: str) -> ToolResult:
-    """
-    Retrieve board of directors for a given company ticker using SEC API.
-    """
-    load_dotenv()
-
-    api_key = os.getenv("SEC_API_KEY")
-    if not api_key:
-        return ToolResult("SEC_API_KEY not found in environment.")
-
-    url = f"https://api.sec-api.io/directors-and-board-members?token={api_key}"
-    headers = {"Content-Type": "application/json"}
-    payload = {
-        "query": f"ticker:{ticker}",
-        "from": 0,
-        "size": 10,
-        "sort": [{"filedAt": {"order": "desc"}}]
-    }
-
-    try:
-        response = requests.post(url, json=payload, headers=headers)
-        response.raise_for_status()
-    except requests.RequestException as e:
-        return ToolResult(f"API error: {e}")
-
-    data = response.json().get("data", [])
-    if not data:
-        return ToolResult(f"No board members found for {ticker}.")
-
-    output = f"Board of Directors for {ticker}:\n\n"
-    for entry in data:
-        for director in entry.get("directors", []):
-            name = director.get("name", "N/A")
-            position = director.get("position", "N/A")
-            output += f"• {name} - {position}\n"
-
-    return ToolResult(output)
+def create_board_agent():
+    return Agent(
+        name="mkt_board_of_directors",
+        model=OpenAIChat(id="gpt-4o"),
+        tools=[get_board_of_directors],
+        description="Use SEC API to find board of directors for a public company based on ticker symbol (e.g., PEP).",
+        storage=SqliteAgentStorage(table_name="board_of_directors", db_file="tmp/agents.db"),
+        markdown=True,
+        add_datetime_to_instructions=True,
+        add_history_to_messages=True,
+        num_history_responses=5
+    )
