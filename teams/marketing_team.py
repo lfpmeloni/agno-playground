@@ -48,14 +48,14 @@ def create_marketing_team():
         )
     )
 
+def get_marketing_team():
+    return create_marketing_team()
+
 if __name__ == "__main__":
     import asyncio
-
-    prompt = sys.argv[1] if len(sys.argv) > 1 else "Generate personalized insights webpages for one random PepsiCo board member."
-    marketing_team = create_marketing_team()
     asyncio.run(
-        marketing_team.aprint_response(
-            message=prompt,
+        get_marketing_team().aprint_response(
+            message="Generate personalized insights webpages for PepsiCo board members.",
             stream=True,
             stream_intermediate_steps=True,
         )

@@ -5,7 +5,9 @@ from agno.tools.duckduckgo import DuckDuckGoTools
 from agno.tools.googlesearch import GoogleSearchTools
 from agno.tools.python import PythonTools
 
-from tools.save_html_tool import save_html_tool
+from tools.save_html_tool import save_html_tool as base_save_html_tool
+from agno.tools import Tool
+
 import os
 from datetime import datetime
 
@@ -29,18 +31,29 @@ def update_index(new_filename: str):
             index_file.write(f"<li><a href=\"{filename}\">{label}</a> - Updated on {mtime}</li>")
         index_file.write("</ul></body></html>")
 
+# Wrap SaveHTMLTool to update index after saving
+class SaveAndUpdateHTMLTool(Tool):
+    def __init__(self):
+        super().__init__(
+            name="SaveHTMLTool",
+            description="Saves an HTML file and updates index.html"
+        )
+
+    def entrypoint(self, name: str, html_content: str) -> str:
+        result = base_save_html_tool.entrypoint(name=name, html_content=html_content)
+        update_index(name)
+        return result
+
 def create_content_generator_agent():
     return Agent(
         name="mkt_content_generator",
-        description=(
-            "Generates personalized HTML content using Crowe.com articles based on the interests of a board member."
-        ),
+        description="Generates personalized HTML content using Crowe.com articles based on the interests of a board member.",
         model=OpenAIChat(id="gpt-4o"),
         tools=[
             DuckDuckGoTools(),
             GoogleSearchTools(),
             PythonTools(),
-            save_html_tool
+            SaveAndUpdateHTMLTool()
         ],
         instructions=[
             "You will receive the name of a board member and a list of their verified or inferred interests.",
@@ -54,7 +67,6 @@ def create_content_generator_agent():
             "After saving the HTML, call update_index() with the filename to ensure the index.html is always up to date.",
             "DO NOT print or display the HTML. Only return a confirmation and the link: http://172.178.45.177:8080/<filename>.html."
         ],
-        post_run_hook=update_index,
         markdown=True,
         show_tool_calls=True,
         add_datetime_to_instructions=True,
