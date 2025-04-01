@@ -1,41 +1,15 @@
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-
-from agno.agent import Agent
-from agno.models.openai import OpenAIChat
 from agno.playground import Playground, serve_playground_app
-from agno.storage.agent.sqlite import SqliteAgentStorage
-from agno.team.team import Team
-
-# Custom agents
 from agents.exp_web_agent import web_agent
 from agents.exp_finance_agent import finance_agent
 from agents.mkt_board_of_directors import create_board_agent
 from agents.mkt_bod_interests import create_bod_interests_agent
 from agents.mkt_content_generator import create_content_generator_agent
-from agents.mkt_marketing_agent import create_marketing_agent
 from agents.hr_quarter_review import create_quarterly_review_agent
-
-# Custom teams
-from teams.marketing_team import marketing_team
-
-# Custom workflows
-from workflows.mkt_orchestration import PersonalizedMarketingWorkflow
-from agno.storage.sqlite import SqliteStorage
 
 # SQLite path
 agent_storage = "tmp/agents.db"
-
-workflow_storage = SqliteStorage(
-    table_name="mkt_orchestration_workflow",
-    db_file="tmp/agno_workflows.db"
-)
-
-mkt_workflow = PersonalizedMarketingWorkflow(
-    workflow_id="marketing-orchestration-workflow",
-    storage=workflow_storage
-)
-
 
 # Playground app definition
 app = Playground(
@@ -45,14 +19,7 @@ app = Playground(
         create_board_agent(),
         create_bod_interests_agent(),
         create_content_generator_agent(),
-        create_marketing_agent(),
         create_quarterly_review_agent()
-    ],
-    teams=[
-        marketing_team
-    ],
-    workflows=[
-        mkt_workflow
     ]
 ).get_app()
 
