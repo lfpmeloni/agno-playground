@@ -8,3 +8,6 @@ fastapi[all]
 uvicorn
 python-dotenv
 wikipedia
+googlesearch-python
+pycountry
+tavily-python

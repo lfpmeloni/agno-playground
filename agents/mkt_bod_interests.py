@@ -6,7 +6,6 @@ from agno.tools.wikipedia import WikipediaTools
 from agno.tools.python import PythonTools
 from agno.tools.duckduckgo import DuckDuckGoTools
 from agno.tools.googlesearch import GoogleSearchTools
-from agno.tools.tavily import TavilyTools
 
 def create_bod_interests_agent():
     return Agent(
@@ -19,13 +18,12 @@ def create_bod_interests_agent():
         tools=[
             DuckDuckGoTools(),
             GoogleSearchTools(),
-            TavilyTools(),
             WikipediaTools(),
             PythonTools()
         ],
         instructions=[
             "You will receive the name of a board member.",
-            "Use DuckDuckGo for a **single query** to retrieve relevant information. If DuckDuckGo fails, try Google Search, and then Tavily as a last resort.",
+            "Use DuckDuckGo for a **single query** to retrieve relevant information. If DuckDuckGo fails, try Google Search as a last resort.",
             "Combine keywords wisely, such as name + 'LinkedIn', 'interview', 'leadership', or company name.",
             "From search results, extract direct quotes or summaries that reflect real, verifiable interests.",
             "Use Wikipedia only if all search tools fail or give no useful data.",

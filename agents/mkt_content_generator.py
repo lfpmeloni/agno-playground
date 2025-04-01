@@ -3,7 +3,6 @@ from agno.models.openai import OpenAIChat
 from agno.storage.agent.sqlite import SqliteAgentStorage
 from agno.tools.duckduckgo import DuckDuckGoTools
 from agno.tools.googlesearch import GoogleSearchTools
-from agno.tools.tavily import TavilyTools
 from agno.tools.python import PythonTools
 
 from tools.save_html_tool import save_html_tool
@@ -23,13 +22,12 @@ def create_content_generator_agent():
         tools=[
             DuckDuckGoTools(),
             GoogleSearchTools(),
-            TavilyTools(),
             PythonTools(),
             save_html_tool
         ],
         instructions=[
             "You will receive the name of a board member and a list of interests.",
-            "Use DuckDuckGo for a **single query** to retrieve relevant information. If DuckDuckGo fails, try Google Search, and then Tavily as a last resort.",
+            "Use DuckDuckGo for a **single query** to retrieve relevant information. If DuckDuckGo fails, try Google Search as a last resort.",
             " Combine keywords efficiently, e.g., 'site:Crowe.com governance AND leadership'.",
             "Focus only on Crowe.com results. If none are found, mention that gracefully.",
             "Extract key insights from those articles and reframe them in a way that matches the board member’s background or interest area.",
