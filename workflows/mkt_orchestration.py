@@ -2,6 +2,7 @@ import sys
 import argparse
 import asyncio
 import os
+import re
 
 from agno.workflow import Workflow
 from agno.models.openai import OpenAIChat
@@ -29,10 +30,17 @@ class PersonalizedMarketingWorkflow(Workflow):
 
         logger.info("🔍 Fetching Board Members from SEC...")
         board_response = await self.board_extractor.arun(ticker_or_name)
-        names = board_response.content if isinstance(board_response.content, list) else []
+        content = board_response.content
+
+        if not content or not isinstance(content, str):
+            return RunResponse(content="⚠️ No board members found.", event=RunEvent.workflow_completed)
+
+        # Extract names using regex (format: Name: Title/Info)
+        names = re.findall(r"^([A-Z][a-zA-Z\-\.\s']+):", content, re.MULTILINE)
+        logger.info(f"📋 Extracted names: {names}")
 
         if not names:
-            return RunResponse(content="⚠️ No board members found.", event=RunEvent.workflow_completed)
+            return RunResponse(content="⚠️ No board members found after parsing.", event=RunEvent.workflow_completed)
 
         final_outputs = []
         for name in names:
