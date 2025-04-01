@@ -8,11 +8,18 @@ from teams.marketing_team import get_marketing_team
 
 app = Flask(__name__)
 
-# Store running output for job tracking
+# Store running output and active jobs
 outputs = {}
+running_jobs = set()
+team_instance = get_marketing_team()
 
 # Async function to run agent and stream output to terminal + store
 async def run_team_agent(prompt, job_id):
+    if job_id in running_jobs:
+        print(f"⚠️ Job {job_id} already running. Skipping duplicate launch.")
+        return
+
+    running_jobs.add(job_id)
     outputs[job_id] = "Task started...\n"
 
     async def stream_output(chunk):
@@ -21,7 +28,7 @@ async def run_team_agent(prompt, job_id):
 
     try:
         print(f"\n🔁 Running marketing_team with job_id: {job_id}\n")
-        await get_marketing_team().aprint_response(
+        await team_instance.aprint_response(
             message=prompt,
             stream=True,
             stream_intermediate_steps=True,
@@ -31,6 +38,8 @@ async def run_team_agent(prompt, job_id):
     except Exception as e:
         print(f"❌ Error in job {job_id}: {e}")
         outputs[job_id] += f"\n❌ Error: {e}"
+    finally:
+        running_jobs.remove(job_id)
 
 # Route to submit job and start background async task
 @app.route('/', methods=['GET', 'POST'])

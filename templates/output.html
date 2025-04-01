@@ -4,16 +4,14 @@
     <meta charset="utf-8">
     <title>Agent Output</title>
     <script>
-      async function checkStatus() {
-        const response = await fetch(`/status/{{ job_id }}`);
-        const text = await response.text();
-        document.getElementById('output').innerHTML = text;
-        if (!text.includes("Still running...")) {
-          clearInterval(polling);
-        }
-      }
-      const polling = setInterval(checkStatus, 2000);
-    </script>
+        setInterval(function () {
+          fetch(`/status/{{ job_id }}`)
+            .then(response => response.text())
+            .then(html => {
+              document.getElementById("output").innerHTML = html;
+            });
+        }, 2000);
+      </script>
   </head>
   <body>
     <h1>Marketing Team Execution Output</h1>
