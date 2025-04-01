@@ -6,7 +6,6 @@ from agno.tools.googlesearch import GoogleSearchTools
 from agno.tools.python import PythonTools
 
 from tools.save_html_tool import save_html_tool as base_save_html_tool
-from agno.tools import tool
 
 import os
 from datetime import datetime
@@ -31,13 +30,10 @@ def update_index(new_filename: str):
             index_file.write(f"<li><a href=\"{filename}\">{label}</a> - Updated on {mtime}</li>")
         index_file.write("</ul></body></html>")
 
-# Wrap SaveHTMLTool to update index after saving
-class SaveAndUpdateHTMLTool(tool):
-    def __init__(self):
-        super().__init__(
-            name="SaveHTMLTool",
-            description="Saves an HTML file and updates index.html"
-        )
+# Wrapper tool function
+class SaveAndUpdateHTMLTool:
+    name = "SaveHTMLTool"
+    description = "Saves an HTML file and updates index.html"
 
     def entrypoint(self, name: str, html_content: str) -> str:
         result = base_save_html_tool.entrypoint(name=name, html_content=html_content)
