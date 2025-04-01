@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, render_template_string
 import threading
+import re
 import io
 import uuid
 import asyncio
@@ -7,6 +8,8 @@ from contextlib import redirect_stdout
 from teams.marketing_team import get_marketing_team
 
 app = Flask(__name__)
+
+ansi_escape = re.compile(r'(?:\x1B[@-_][0-?]*[ -/]*[@-~])')
 
 # Store running output and job status
 outputs = {}
@@ -20,7 +23,9 @@ async def run_team_agent(prompt, job_id):
 
     async def stream_output(chunk):
         # Also capture what Agno gives directly
-        outputs[job_id] += chunk
+        print(chunk, end="", flush=True)
+        clean_chunk = ansi_escape.sub('', chunk)
+        outputs[job_id] += clean_chunk
 
     try:
         print(f"\n🔁 Running marketing_team with job_id: {job_id}\n")
