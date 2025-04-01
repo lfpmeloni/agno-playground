@@ -23,29 +23,36 @@
       }
     </style>
     <script>
+      function escapeHTML(text) {
+        return text
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+      }
+
+      function parseTerminalHyperlinks(text) {
+        // Handle ANSI OSC 8 hyperlinks: d=XXX;http://...ESC\TextESC]8;;ESC\
+        // ESC = \x1b (represented as \u001b in JS)
+        const linkRegex = /d=\d+;(https?:\/\/[^\s\x1b]+)\u001b\\(.*?)\u001b]8;;\u001b\\/g;
+        return text.replace(linkRegex, (_, url, label) => {
+          return `<a href="${url}" target="_blank" rel="noopener noreferrer">${escapeHTML(label)}</a>`;
+        });
+      }
+
       function fetchStatus() {
         fetch("/status/{{ job_id }}", {
-          headers: {
-            "X-Requested-With": "XMLHttpRequest"
-          }
+          headers: { "X-Requested-With": "XMLHttpRequest" }
         })
         .then(response => response.text())
         .then(text => {
-          const outputDiv = document.getElementById("output");
+          // Step 1: Escape everything first
+          let safeText = escapeHTML(text);
 
-          // Escape HTML first
-          let safeText = text
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;");
+          // Step 2: Replace hyperlinks (escaped separately to preserve other content)
+          safeText = parseTerminalHyperlinks(safeText);
 
-          // Convert raw URLs into clickable links
-          safeText = safeText.replace(
-            /(https?:\/\/[^\s]+)/g,
-            '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'
-          );
-
-          outputDiv.innerHTML = safeText;
+          // Step 3: Display in pre block
+          document.getElementById("output").innerHTML = safeText;
 
           if (!text.includes("🏁 Job finished.") && !text.includes("❌ Error")) {
             setTimeout(fetchStatus, 2000); // keep polling
