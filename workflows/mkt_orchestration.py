@@ -31,7 +31,10 @@ class PersonalizedMarketingWorkflow(Workflow):
         board_response = await self.board_extractor.arun(ticker_or_name)
         names = board_response.content if isinstance(board_response.content, list) else []
 
-        final_results = []
+        if not names:
+            return RunResponse(content="⚠️ No board members found.", event=RunEvent.workflow_completed)
+
+        final_outputs = []
         for name in names:
             logger.info(f"🎯 Finding interests for {name}")
             interests_response = await self.interest_enricher.arun(name)
@@ -41,11 +44,11 @@ class PersonalizedMarketingWorkflow(Workflow):
                 "interests": interests_response.content
             }
 
-            logger.info(f"🌐 Generating webpage for {name}...")
-            content_response = await self.webpage_generator.arun(enriched_input)
-            final_results.append(f"🔗 {name}: {content_response.content}")
+            logger.info(f"🌐 Generating personalized page for {name}...")
+            generation_response = await self.webpage_generator.arun(enriched_input)
+            final_outputs.append(f"{name}: {generation_response.content}")
 
-        summary = "\n\n".join(final_results)
+        summary = "\n\n".join(final_outputs)
         return RunResponse(
             content=summary,
             event=RunEvent.workflow_completed
