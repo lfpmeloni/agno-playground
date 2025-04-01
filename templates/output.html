@@ -2,14 +2,21 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Marketing Team Output</title>
-    <style>
-      body { font-family: monospace; background-color: #111; color: #eee; padding: 2rem; }
-      pre { background-color: #222; padding: 1rem; overflow-x: auto; white-space: pre-wrap; }
-    </style>
+    <title>Agent Output</title>
+    <script>
+      async function checkStatus() {
+        const response = await fetch(`/status/{{ job_id }}`);
+        const text = await response.text();
+        document.getElementById('output').innerHTML = text;
+        if (!text.includes("Still running...")) {
+          clearInterval(polling);
+        }
+      }
+      const polling = setInterval(checkStatus, 2000);
+    </script>
   </head>
   <body>
     <h1>Marketing Team Execution Output</h1>
-    <pre>{{ output }}</pre>
+    <div id="output"><em>Running...</em></div>
   </body>
 </html>
