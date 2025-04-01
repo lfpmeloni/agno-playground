@@ -29,6 +29,8 @@ marketing_team = Team(
         "You will receive a company name (e.g., 'PepsiCo').",
         "First, use the Board Agent to fetch the board of directors.",
         "For each board member, call the Interest Agent to determine key interests.",
+        "Avoid using Wikipedia unless absolutely necessary. Use DuckDuckGo sparingly—at most 1 query per member.",
+        "If DuckDuckGo fails or rate limits, fallback to general inference from the board member name and title.",
         "Then, call the Content Generator Agent to create a Crowe.com-style personalized insights page.",
         f"Ensure all pages are saved using the SaveHTMLTool and indexed at: {PUBLIC_HTML_BASE_URL}/<name>.html",
         "Finish with a summary and confirmation message.",
