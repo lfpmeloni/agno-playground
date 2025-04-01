@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, render_template_string
 import threading
 import uuid
 import asyncio
@@ -61,13 +61,13 @@ def index():
 def check_status(job_id):
     output = outputs.get(job_id)
     done = output and ("✅ Task completed" in output or "❌ Error" in output or "🏁 Job finished." in output)
-    return render_template(
-        'output.html',
-        job_id=job_id,
-        output=output or "<p><em>Still running...</em></p>",
-        dark_mode=True,
-        done=done
-    )
+
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        # Respond with just the output when called by JavaScript
+        return render_template_string('<pre>{{ output }}</pre>', output=output or "<em>Running...</em>")
+    
+    # Full page render (initial load)
+    return render_template('output.html', job_id=job_id, output=output or "<em>Running...</em>", done=done)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000)

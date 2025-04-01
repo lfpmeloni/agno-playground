@@ -3,46 +3,51 @@
   <head>
     <meta charset="utf-8">
     <title>Agent Output</title>
-    <script>
-      let polling = true;
-
-      function fetchOutput() {
-        if (!polling) return;
-
-        fetch(`/status/{{ job_id }}`)
-          .then(response => response.text())
-          .then(html => {
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
-            const outputDiv = doc.getElementById("output");
-            const done = doc.getElementById("done-flag");
-
-            document.getElementById("output").innerHTML = outputDiv.innerHTML;
-
-            if (done) {
-              polling = false;
-              clearInterval(pollingInterval);
-              document.getElementById("done-message").style.display = "block";
-            }
-          });
+    <style>
+      body {
+        font-family: monospace;
+        background-color: #f4f4f4;
+        padding: 20px;
       }
-
-      const pollingInterval = setInterval(fetchOutput, 2000);
+      #output {
+        background: #fff;
+        border: 1px solid #ccc;
+        padding: 1rem;
+        white-space: pre-wrap;
+        overflow-wrap: break-word;
+        border-radius: 5px;
+      }
+    </style>
+    <script>
+        function fetchStatus() {
+        fetch("/status/{{ job_id }}", {
+            headers: {
+            "X-Requested-With": "XMLHttpRequest"
+            }
+        })
+        .then(response => response.text())
+        .then(html => {
+            const outputDiv = document.getElementById("output");
+            outputDiv.innerHTML = html;
+    
+            if (!html.includes("🏁 Job finished.") && !html.includes("❌ Error")) {
+            setTimeout(fetchStatus, 2000);  // Keep polling
+            }
+        })
+        .catch(error => {
+            document.getElementById("output").innerText = "⚠️ Error fetching agent output.";
+            console.error(error);
+        });
+        }
+    
+        window.onload = fetchStatus;
     </script>
+  
   </head>
   <body>
     <h1>Marketing Team Execution Output</h1>
-
-    <div id="output">
-      {{ output|safe }}
-      {% if done %}
-        <span id="done-flag" style="display: none;"></span>
-      {% endif %}
-    </div>
-
-    <div id="done-message" style="display: none; margin-top: 20px;">
-      <p style="color: green;"><strong>✅ Done!</strong></p>
-      <a href="/">⬅️ Back to Home</a>
-    </div>
+    <div id="output"><em>Running...</em></div>
+    <br>
+    <a href="/" style="text-decoration:none;">⬅️ Back to Home</a>
   </body>
 </html>
