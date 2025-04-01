@@ -4,41 +4,7 @@ from agno.storage.agent.sqlite import SqliteAgentStorage
 from agno.tools.duckduckgo import DuckDuckGoTools
 from agno.tools.googlesearch import GoogleSearchTools
 from agno.tools.python import PythonTools
-
-from tools.save_html_tool import save_html_tool as base_save_html_tool
-
-import os
-from datetime import datetime
-
-# Directory where the generated HTML files will be saved
-PUBLIC_HTML_DIR = os.path.join(os.path.dirname(__file__), "../public")
-os.makedirs(PUBLIC_HTML_DIR, exist_ok=True)
-
-INDEX_FILE_PATH = os.path.join(PUBLIC_HTML_DIR, "index.html")
-
-def update_index(new_filename: str):
-    files = [f for f in os.listdir(PUBLIC_HTML_DIR) if f.endswith(".html") and f != "index.html"]
-    files.sort(key=lambda x: os.path.getmtime(os.path.join(PUBLIC_HTML_DIR, x)), reverse=True)
-
-    with open(INDEX_FILE_PATH, "w") as index_file:
-        index_file.write("<html><head><title>Generated Insights</title></head><body>")
-        index_file.write(f"<h1>Generated Pages (Updated on {datetime.now().strftime('%Y-%m-%d %H:%M')})</h1><ul>")
-        for filename in files:
-            filepath = os.path.join(PUBLIC_HTML_DIR, filename)
-            mtime = datetime.fromtimestamp(os.path.getmtime(filepath)).strftime('%Y-%m-%d %H:%M')
-            label = filename.replace("_", " ").replace(".html", "").title()
-            index_file.write(f"<li><a href=\"{filename}\">{label}</a> - Updated on {mtime}</li>")
-        index_file.write("</ul></body></html>")
-
-# Wrapper tool function
-class SaveAndUpdateHTMLTool:
-    name = "SaveHTMLTool"
-    description = "Saves an HTML file and updates index.html"
-
-    def entrypoint(self, name: str, html_content: str) -> str:
-        result = base_save_html_tool.entrypoint(name=name, html_content=html_content)
-        update_index(name)
-        return result
+from tools.save_html_tool import save_html_tool
 
 def create_content_generator_agent():
     return Agent(
@@ -49,7 +15,7 @@ def create_content_generator_agent():
             DuckDuckGoTools(),
             GoogleSearchTools(),
             PythonTools(),
-            SaveAndUpdateHTMLTool()
+            save_html_tool
         ],
         instructions=[
             "You will receive the name of a board member and a list of their verified or inferred interests.",
