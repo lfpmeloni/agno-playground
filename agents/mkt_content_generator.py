@@ -1,9 +1,9 @@
 from agno.agent import Agent
 from agno.models.openai import OpenAIChat
 from agno.storage.agent.sqlite import SqliteAgentStorage
-from agno.tools.duckduckgo import DuckDuckGoTools
 from agno.tools.python import PythonTools
 
+from tools.limited_duckduckgo import LimitedDuckDuckGo
 from tools.save_html_tool import save_html_tool
 import os
 
@@ -15,22 +15,22 @@ def create_content_generator_agent():
     return Agent(
         name="mkt_content_generator",
         description=(
-            "Generates personalized website content using articles from Crowe.com based on the interests of a board member."
+            "Generates personalized HTML content using Crowe.com articles based on the interests of a board member."
         ),
         model=OpenAIChat(id="gpt-4o"),
         tools=[
-            DuckDuckGoTools(),
+            LimitedDuckDuckGo(max_calls=3).get_tool(),
             PythonTools(),
             save_html_tool
         ],
         instructions=[
-            "You will be given the name of a board member and a list of their interests.",
-            "Use DuckDuckGo to search for relevant Crowe.com content, but **limit yourself to a maximum of 3 total queries**. Combine interest keywords when possible (e.g., 'site:Crowe.com leadership AND innovation').",
-            "Summarize or rephrase key insights from these articles and tailor the insights to the individual’s known interests or background.",
-            "Structure the final output as a full standalone HTML page and save it using SaveHTMLTool (e.g., darren-walker.html).",
-            "Do NOT print or include the HTML content in your response. Just confirm the save.",
-            "Respond only with a success message and the correct public URL: http://172.178.45.177:8080/<filename>. Do not mention localhost or port 3000.",
-            "Your response should only include the public link and confirmation message — avoid explaining your steps."
+            "You will receive the name of a board member and a list of interests.",
+            "Perform **no more than 3 total DuckDuckGo queries**. Combine keywords efficiently, e.g., 'site:Crowe.com governance AND leadership'.",
+            "Focus only on Crowe.com results. If none are found, mention that gracefully.",
+            "Extract key insights from those articles and reframe them in a way that matches the board member’s background or interest area.",
+            "Build a clean, standalone HTML page. Save it using the SaveHTMLTool, following the format 'first-last.html'.",
+            "DO NOT print or echo the HTML in your response — only confirm the save.",
+            "Respond only with a short success message and the correct public link: http://172.178.45.177:8080/<filename>",
         ],
         markdown=True,
         show_tool_calls=True,
