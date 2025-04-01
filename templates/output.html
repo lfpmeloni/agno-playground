@@ -9,7 +9,7 @@
         background-color: #f4f4f4;
         padding: 20px;
       }
-      #output {
+      pre {
         background: #fff;
         border: 1px solid #ccc;
         padding: 1rem;
@@ -26,19 +26,16 @@
           }
         })
         .then(response => response.text())
-        .then(html => {
+        .then(text => {
           const outputDiv = document.getElementById("output");
-          outputDiv.innerHTML = "";
-          const pre = document.createElement("pre");
-          pre.textContent = html;
-          outputDiv.appendChild(pre);
+          outputDiv.textContent = text;
 
-          if (!html.includes("🏁 Job finished.") && !html.includes("❌ Error")) {
-            setTimeout(fetchStatus, 2000);  // Keep polling
+          if (!text.includes("🏁 Job finished.") && !text.includes("❌ Error")) {
+            setTimeout(fetchStatus, 2000); // keep polling
           }
         })
         .catch(error => {
-          document.getElementById("output").innerText = "⚠️ Error fetching agent output.";
+          document.getElementById("output").textContent = "⚠️ Error fetching agent output.";
           console.error(error);
         });
       }
@@ -48,7 +45,7 @@
   </head>
   <body>
     <h1>Marketing Team Execution Output</h1>
-    <div id="output"><em>Running...</em></div>
+    <pre id="output"><em>Running...</em></pre>
     <br>
     <a href="/" style="text-decoration:none;">⬅️ Back to Home</a>
   </body>

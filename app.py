@@ -62,12 +62,17 @@ def check_status(job_id):
     output = outputs.get(job_id)
     done = output and ("✅ Task completed" in output or "❌ Error" in output or "🏁 Job finished." in output)
 
-    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        # Respond with just the output when called by JavaScript
-        return render_template_string('<pre>{{ output }}</pre>', output=output or "<em>Running...</em>")
-    
-    # Full page render (initial load)
-    return render_template('output.html', job_id=job_id, output=output or "<em>Running...</em>", done=done)
+    # When request comes from AJAX, return just the raw string
+    if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+        return output or "Still running..."
+
+    return render_template(
+        'output.html',
+        job_id=job_id,
+        output=output or "Still running...",
+        dark_mode=True,
+        done=done
+    )
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000)
