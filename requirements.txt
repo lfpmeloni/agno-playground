@@ -11,3 +11,4 @@ wikipedia
 googlesearch-python
 pycountry
 tavily-python
+flask

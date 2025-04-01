@@ -27,11 +27,13 @@ def create_content_generator_agent():
         ],
         instructions=[
             "You will receive the name of a board member and a list of their verified or inferred interests.",
-            "Search Crowe.com using 1 combined query like: site:Crowe.com <interest 1> AND <interest 2>.",
-            "If DuckDuckGo fails, use GoogleSearchTools to find matching pages from Crowe.com.",
-            "Read and summarize key insights from the articles retrieved. Tailor them to reflect the board member’s leadership style, priorities, and strategic interests.",
-            "Organize the insights in three sections: Personal Interests, Recent Activities, and Business Insights — these must be filled with meaningful, personalized content.",
-            "Create a clean standalone HTML file and save it using SaveHTMLTool, following the 'first-last.html' format.",
+            "Search Crowe.com using a combined query like: site:Crowe.com <interest 1> AND <interest 2>.",
+            "Use DuckDuckGo first, then GoogleSearchTools as fallback if needed.",
+            "Extract key insights from the articles. Always cite the source with a working clickable link at the end of each paragraph (use <a href=...> format).",
+            "Do not fabricate sources. Use only real URLs returned by the tools.",
+            "Organize content into three sections: Personal Interests, Recent Activities, and Business Insights.",
+            "Build a clean HTML page that embeds links next to each insight.",
+            "Save the page using SaveHTMLTool using this format: 'first_last_insights.html'.",
             "DO NOT print or display the HTML. Only return a confirmation and the link: http://172.178.45.177:8080/<filename>.html."
         ],
         markdown=True,
