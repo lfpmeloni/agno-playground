@@ -84,6 +84,8 @@ def index():
         thread.start()
 
         return redirect(url_for('check_status', job_id=job_id))
+    
+    return render_template('index.html', dark_mode=True)
 
 @app.route('/status/<job_id>')
 def check_status(job_id):
