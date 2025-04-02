@@ -5,7 +5,7 @@ from agents.hr_feedback_agent import create_feedback_agent
 from agents.hr_client_work_agent import create_client_work_agent
 from agents.hr_goal_alignment_agent import create_goal_alignment_agent
 
-def create_hr_team():
+def get_hr_team():
     return Team(
         name="HR Team Coordinator",
         team_id="hr_team",
