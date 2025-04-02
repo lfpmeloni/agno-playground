@@ -63,29 +63,14 @@ async def run_team_agent(prompt, job_id, team_instance):
         running_jobs.discard(job_id)
         outputs[job_id] += "\n🏁 Job finished.\n"
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route("/", methods=["GET", "POST"])
 def index():
-    if request.method == 'POST':
-        agent_name = request.form['agent']
-        prompt = request.form['prompt']
-        job_id = str(uuid.uuid4())
-
-        if job_id in running_jobs:
-            return redirect(url_for('check_status', job_id=job_id))
-
-        running_jobs.add(job_id)
-
-        team_instance = load_team(agent_name)  # ⬅️ Here we load based on selection
-
-        def start_async_task():
-            asyncio.run(run_team_agent(prompt, job_id, team_instance))
-
-        thread = threading.Thread(target=start_async_task)
-        thread.start()
-
-        return redirect(url_for('check_status', job_id=job_id))
-    
-    return render_template('index.html', dark_mode=True)
+    if request.method == "POST":
+        agent = request.form.get("agent")
+        prompt = request.form.get("prompt")
+        # Process the agent and prompt...
+        return render_template("index.html")
+    return render_template("index.html")
 
 @app.route('/status/<job_id>')
 def check_status(job_id):
