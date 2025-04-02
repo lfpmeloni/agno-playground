@@ -33,7 +33,7 @@ jobs_meta = {}  # maps job_id to metadata (e.g. {"agent": "marketing_team"})
 active_jobs_by_agent = {}
 running_jobs = set()
 
-# Define HR docs folder (assumed to be in the same directory as app.py)
+# Define HR docs folder; adjust this if your project structure is different.
 HR_DOCS_DIR = os.path.join(os.path.dirname(__file__), 'hr_docs')
 if not os.path.exists(HR_DOCS_DIR):
     os.makedirs(HR_DOCS_DIR)
@@ -79,11 +79,10 @@ def index():
         prompt = request.form.get("prompt")
         if not prompt:
             return render_template("index.html", error="Prompt cannot be empty.")
-        # Check if a job is already running for this agent.
+        # If a job for this agent is already running, redirect to that status page.
         existing_job = active_jobs_by_agent.get(agent)
         if existing_job and existing_job in outputs and "🏁 Job finished." not in outputs[existing_job]:
             return redirect(url_for('check_status', job_id=existing_job))
-
         try:
             team_instance = load_team(agent)
         except ValueError as e:
@@ -144,7 +143,7 @@ def documents():
                 filepath = os.path.join(HR_DOCS_DIR, safe_name)
                 file.save(filepath)
                 return redirect(url_for('documents'))
-    # List only .txt files
+    # List only .txt files from the hr_docs folder.
     all_files = os.listdir(HR_DOCS_DIR)
     txt_files = [f for f in all_files if f.lower().endswith('.txt')]
     return render_template("documents.html", files=txt_files, error=error)
