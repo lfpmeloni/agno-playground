@@ -11,7 +11,15 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from teams.marketing_team import get_marketing_team
+from teams.hr_team_coordinator import get_hr_team
 
+def load_team(agent_name):
+    if agent_name == "marketing_team":
+        return get_marketing_team()
+    elif agent_name == "hr_team_coordinator":
+        return get_hr_team()
+    else:
+        raise ValueError(f"Unknown agent name: {agent_name}")
 
 app = Flask(__name__)
 
@@ -21,9 +29,8 @@ ansi_escape = re.compile(r'(?:\x1B[@-_][0-?]*[ -/]*[@-~])')
 # Store job outputs and status
 outputs = {}
 running_jobs = set()
-team_instance = get_marketing_team()
 
-async def run_team_agent(prompt, job_id):
+async def run_team_agent(prompt, job_id, team_instance):
     outputs[job_id] = "🔁 Task started...\n"
     f = io.StringIO()
 
@@ -33,7 +40,7 @@ async def run_team_agent(prompt, job_id):
         print(chunk, end="", flush=True)
 
     try:
-        print(f"\n🔁 Running marketing_team with job_id: {job_id}\n")
+        print(f"\n🔁 Running {team_instance.name} with job_id: {job_id}\n")
         running_jobs.add(job_id)
 
         # Redirect stdout (e.g., print() calls)
@@ -59,6 +66,7 @@ async def run_team_agent(prompt, job_id):
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
+        agent_name = request.form['agent']
         prompt = request.form['prompt']
         job_id = str(uuid.uuid4())
 
@@ -67,14 +75,15 @@ def index():
 
         running_jobs.add(job_id)
 
+        team_instance = load_team(agent_name)  # ⬅️ Here we load based on selection
+
         def start_async_task():
-            asyncio.run(run_team_agent(prompt, job_id))
+            asyncio.run(run_team_agent(prompt, job_id, team_instance))
 
         thread = threading.Thread(target=start_async_task)
         thread.start()
 
         return redirect(url_for('check_status', job_id=job_id))
-    return render_template('index.html', dark_mode=True)
 
 @app.route('/status/<job_id>')
 def check_status(job_id):
