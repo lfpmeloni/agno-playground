@@ -96,12 +96,16 @@ def check_status(job_id):
     if request.headers.get("X-Requested-With") == "XMLHttpRequest":
         return output or "Still running..."
 
+    # NEW: infer agent name from output (hacky but works)
+    agent_name = "HR Review Team" if "BOLD_GOALS" in output else "Marketing Team"
+
     return render_template(
         'output.html',
         job_id=job_id,
         output=output or "Still running...",
         dark_mode=True,
-        done=done
+        done=done,
+        agent_name=agent_name
     )
 
 if __name__ == '__main__':
