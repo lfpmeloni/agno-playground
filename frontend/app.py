@@ -1,13 +1,14 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, send_from_directory
 import threading
 import re
 import io
 import uuid
 import asyncio
+import os
 from contextlib import redirect_stdout
+from werkzeug.utils import secure_filename
 
 import sys
-import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from teams.marketing_team import get_marketing_team
@@ -28,11 +29,14 @@ ansi_escape = re.compile(r'(?:\x1B[@-_][0-?]*[ -/]*[@-~])')
 
 # Global dictionaries to store job outputs, metadata, and active jobs per agent
 outputs = {}
-# jobs_meta maps job_id to metadata (e.g. {"agent": "marketing_team"})
-jobs_meta = {}
-# active_jobs_by_agent maps an agent to its currently running job id
+jobs_meta = {}  # maps job_id to metadata (e.g. {"agent": "marketing_team"})
 active_jobs_by_agent = {}
 running_jobs = set()
+
+# Define HR docs folder (assumed to be in the same directory as app.py)
+HR_DOCS_DIR = os.path.join(os.path.dirname(__file__), 'hr_docs')
+if not os.path.exists(HR_DOCS_DIR):
+    os.makedirs(HR_DOCS_DIR)
 
 async def run_team_agent(prompt, job_id, team_instance):
     outputs[job_id] = "🔁 Task started...\n"
@@ -47,7 +51,6 @@ async def run_team_agent(prompt, job_id, team_instance):
         print(f"\n🔁 Running {team_instance.name} with job_id: {job_id}\n")
         running_jobs.add(job_id)
 
-        # Redirect stdout (e.g., print() calls)
         with redirect_stdout(f):
             await team_instance.aprint_response(
                 message=prompt,
@@ -56,7 +59,6 @@ async def run_team_agent(prompt, job_id, team_instance):
                 callback=stream_output
             )
 
-        # Append any captured stdout after completion
         clean_stdout = ansi_escape.sub('', f.getvalue())
         outputs[job_id] += clean_stdout
         outputs[job_id] += "\n✅ Task completed successfully.\n"
@@ -66,7 +68,6 @@ async def run_team_agent(prompt, job_id, team_instance):
     finally:
         running_jobs.discard(job_id)
         outputs[job_id] += "\n🏁 Job finished.\n"
-        # Remove the active job mapping for this agent if it is the same job id
         agent = jobs_meta.get(job_id, {}).get("agent")
         if agent in active_jobs_by_agent and active_jobs_by_agent[agent] == job_id:
             del active_jobs_by_agent[agent]
@@ -78,8 +79,7 @@ def index():
         prompt = request.form.get("prompt")
         if not prompt:
             return render_template("index.html", error="Prompt cannot be empty.")
-
-        # If a job for this agent is already running, redirect to that status page
+        # Check if a job is already running for this agent.
         existing_job = active_jobs_by_agent.get(agent)
         if existing_job and existing_job in outputs and "🏁 Job finished." not in outputs[existing_job]:
             return redirect(url_for('check_status', job_id=existing_job))
@@ -102,11 +102,9 @@ def check_status(job_id):
     output = outputs.get(job_id)
     done = output and ("✅ Task completed" in output or "❌ Error" in output or "🏁 Job finished." in output)
 
-    # For AJAX polling requests, return plain text output
     if request.headers.get("X-Requested-With") == "XMLHttpRequest":
         return output or "Still running..."
 
-    # Use stored metadata for header (or default to a generic header)
     job_meta = jobs_meta.get(job_id, {})
     agent = job_meta.get("agent", "")
     if agent == "marketing_team":
@@ -124,6 +122,45 @@ def check_status(job_id):
         done=done,
         agent_name=header
     )
+
+# -----------------------------
+# HR Documents Management Routes
+# -----------------------------
+@app.route('/documents', methods=["GET", "POST"])
+def documents():
+    error = None
+    if request.method == "POST":
+        # Handle file upload
+        if 'file' not in request.files:
+            error = "No file part in the request."
+        else:
+            file = request.files['file']
+            if file.filename == '':
+                error = "No selected file."
+            elif not file.filename.lower().endswith('.txt'):
+                error = "Only .txt files are allowed."
+            else:
+                safe_name = secure_filename(file.filename)
+                filepath = os.path.join(HR_DOCS_DIR, safe_name)
+                file.save(filepath)
+                return redirect(url_for('documents'))
+    # List only .txt files
+    all_files = os.listdir(HR_DOCS_DIR)
+    txt_files = [f for f in all_files if f.lower().endswith('.txt')]
+    return render_template("documents.html", files=txt_files, error=error)
+
+@app.route('/documents/delete/<filename>', methods=["POST"])
+def delete_document(filename):
+    safe_filename = secure_filename(filename)
+    file_path = os.path.join(HR_DOCS_DIR, safe_filename)
+    if os.path.exists(file_path):
+         os.remove(file_path)
+    return redirect(url_for('documents'))
+
+@app.route('/documents/view/<filename>')
+def view_document(filename):
+    safe_filename = secure_filename(filename)
+    return send_from_directory(HR_DOCS_DIR, safe_filename)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000)

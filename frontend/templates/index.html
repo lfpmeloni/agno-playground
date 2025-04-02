@@ -27,7 +27,7 @@
       font-size: 1.2rem;
       margin-bottom: 2rem;
     }
-    .sidebar select {
+    .sidebar select, .sidebar a button {
       margin-bottom: 1rem;
       background-color: #2a2a2a;
       color: white;
@@ -35,16 +35,6 @@
       border-radius: 5px;
       padding: 0.5rem;
       width: 100%;
-    }
-    .sidebar a button {
-      background-color: #2a2a2a;
-      border: none;
-      color: #f3f3f3;
-      padding: 0.5rem 1rem;
-      margin-top: 1rem;
-      width: 100%;
-      cursor: pointer;
-      border-radius: 5px;
     }
     .main {
       flex: 1;
@@ -97,12 +87,13 @@
 <body>
   <div class="sidebar">
     <h1>PARENT AGENT UI</h1>
+    <a href="/"><button>Home</button></a>
+    <a href="/documents"><button>Upload Documents</button></a>
     <!-- Team selector placed in the sidebar -->
     <select id="agent" name="agent">
       <option value="marketing_team">Marketing Team</option>
       <option value="hr_team_coordinator">HR Review Team</option>
     </select>
-    <a href="/"><button>Home</button></a>
   </div>
 
   <div class="main">
