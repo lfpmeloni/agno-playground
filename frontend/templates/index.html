@@ -1,30 +1,107 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Agent UI</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-  </head>
-  <body class="bg-gray-100 h-screen flex items-center justify-center">
-    <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-      <h1 class="text-2xl font-bold mb-6 text-center">Run an Agent</h1>
-      <form method="POST" class="space-y-4">
-        <div>
-          <label for="agent" class="block text-sm font-medium text-gray-700">Select Agent:</label>
-          <select name="agent" id="agent" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-            <option value="marketing_team">Marketing Team</option>
-            <!-- Additional agents can be added here -->
-          </select>
-        </div>
-        <div>
-          <label for="prompt" class="block text-sm font-medium text-gray-700">Enter prompt:</label>
-          <textarea name="prompt" id="prompt" rows="6" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="Type your prompt here..."></textarea>
-        </div>
-        <div>
-          <button type="submit" class="w-full bg-indigo-600 text-white p-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Send</button>
-        </div>
-      </form>
+<head>
+  <meta charset="utf-8">
+  <title>Agent Playground</title>
+  <style>
+    body {
+      margin: 0;
+      display: flex;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #121212;
+      color: white;
+      height: 100vh;
+    }
+
+    .sidebar {
+      width: 250px;
+      background-color: #1e1e1e;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid #333;
+    }
+
+    .sidebar h1 {
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+
+    .sidebar select,
+    .sidebar a {
+      background-color: #2a2a2a;
+      color: white;
+      border: none;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      text-decoration: none;
+      display: block;
+      text-align: center;
+    }
+
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .content {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    form {
+      display: flex;
+      background-color: #1e1e1e;
+      padding: 10px 20px;
+      border-top: 1px solid #333;
+    }
+
+    textarea {
+      flex: 1;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 5px;
+      border: none;
+      resize: none;
+    }
+
+    button {
+      background-color: #4f46e5;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      margin-left: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #4338ca;
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <h1>🧠 AGENT UI</h1>
+    <a href="/">🏠 Home</a>
+    <form method="POST">
+      <label for="agent">Select Agent:</label>
+      <select name="agent" id="agent">
+        <option value="marketing_team">Marketing Team</option>
+      </select>
+      <label for="prompt">Prompt:</label>
+      <textarea name="prompt" id="prompt" rows="4" placeholder="Type your prompt..."></textarea>
+      <button type="submit">▶ Run</button>
+    </form>
+  </div>
+  <div class="main">
+    <div class="content">
+      <h2>Welcome to the Agent Playground</h2>
+      <p>Start by selecting an agent and submitting a prompt using the sidebar.</p>
     </div>
-  </body>
+  </div>
+</body>
 </html>
