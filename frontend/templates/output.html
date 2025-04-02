@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Agent Output</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      function escapeHTML(text) {
+        return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      }
+
+      function parseTerminalHyperlinks(text) {
+        const linkRegex = /d=\d+;(https?:\/\/[^\s\x1b]+)\u001b\\(.*?)\u001b]8;;\u001b\\/g;
+        return text.replace(linkRegex, (_, url, label) => `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-blue-500 underline">${escapeHTML(label)}</a>`);
+      }
+
+      function fetchStatus() {
+        fetch("/status/{{ job_id }}", { headers: { "X-Requested-With": "XMLHttpRequest" } })
+          .then(response => response.text())
+          .then(text => {
+            let safeText = escapeHTML(text);
+            safeText = parseTerminalHyperlinks(safeText);
+            document.getElementById("output").innerHTML = safeText;
+            if (!text.includes("🏁 Job finished.") && !text.includes("❌ Error")) {
+              setTimeout(fetchStatus, 2000);
+            }
+          })
+          .catch(error => {
+            document.getElementById("output").textContent = "⚠️ Error fetching agent output.";
+            console.error(error);
+          });
+      }
+
+      window.onload = fetchStatus;
+    </script>
+  </head>
+  <body class="bg-gray-100 h-screen flex items-center justify-center">
+    <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-2xl">
+      <h1 class="text-2xl font-bold mb-6 text-center">Marketing Team Execution Output</h1>
+      <pre id="output" class="bg-gray-100 p-4 rounded-md border border-gray-300"><em>Running...</em></pre>
+      <div class="mt-4 text-center">
+        <a href="/" class="text-indigo-600 hover:text-indigo-800">⬅️ Back to Home</a>
+      </div>
+    </div>
+  </body>
+</html>
