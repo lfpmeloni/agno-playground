@@ -26,8 +26,12 @@ app = Flask(__name__)
 # Regex to remove ANSI escape sequences (e.g., colors)
 ansi_escape = re.compile(r'(?:\x1B[@-_][0-?]*[ -/]*[@-~])')
 
-# Store job outputs and status
+# Global dictionaries to store job outputs, metadata, and active jobs per agent
 outputs = {}
+# jobs_meta maps job_id to metadata (e.g. {"agent": "marketing_team"})
+jobs_meta = {}
+# active_jobs_by_agent maps an agent to its currently running job id
+active_jobs_by_agent = {}
 running_jobs = set()
 
 async def run_team_agent(prompt, job_id, team_instance):
@@ -52,7 +56,7 @@ async def run_team_agent(prompt, job_id, team_instance):
                 callback=stream_output
             )
 
-        # Append captured stdout after completion
+        # Append any captured stdout after completion
         clean_stdout = ansi_escape.sub('', f.getvalue())
         outputs[job_id] += clean_stdout
         outputs[job_id] += "\n✅ Task completed successfully.\n"
@@ -62,6 +66,10 @@ async def run_team_agent(prompt, job_id, team_instance):
     finally:
         running_jobs.discard(job_id)
         outputs[job_id] += "\n🏁 Job finished.\n"
+        # Remove the active job mapping for this agent if it is the same job id
+        agent = jobs_meta.get(job_id, {}).get("agent")
+        if agent in active_jobs_by_agent and active_jobs_by_agent[agent] == job_id:
+            del active_jobs_by_agent[agent]
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -70,12 +78,19 @@ def index():
         prompt = request.form.get("prompt")
         if not prompt:
             return render_template("index.html", error="Prompt cannot be empty.")
+
+        # If a job for this agent is already running, redirect to that status page
+        existing_job = active_jobs_by_agent.get(agent)
+        if existing_job and existing_job in outputs and "🏁 Job finished." not in outputs[existing_job]:
+            return redirect(url_for('check_status', job_id=existing_job))
+
         try:
             team_instance = load_team(agent)
         except ValueError as e:
             return render_template("index.html", error=str(e))
         job_id = str(uuid.uuid4())
-        # Run the team agent asynchronously in a new thread
+        jobs_meta[job_id] = {"agent": agent}
+        active_jobs_by_agent[agent] = job_id
         threading.Thread(
             target=lambda: asyncio.run(run_team_agent(prompt, job_id, team_instance))
         ).start()
@@ -87,12 +102,19 @@ def check_status(job_id):
     output = outputs.get(job_id)
     done = output and ("✅ Task completed" in output or "❌ Error" in output or "🏁 Job finished." in output)
 
-    # For AJAX polling
+    # For AJAX polling requests, return plain text output
     if request.headers.get("X-Requested-With") == "XMLHttpRequest":
         return output or "Still running..."
 
-    # Infer agent name from output (hacky but works)
-    agent_name = "HR Review Team" if output and "BOLD_GOALS" in output else "Marketing Team"
+    # Use stored metadata for header (or default to a generic header)
+    job_meta = jobs_meta.get(job_id, {})
+    agent = job_meta.get("agent", "")
+    if agent == "marketing_team":
+         header = "Marketing Team Output"
+    elif agent == "hr_team_coordinator":
+         header = "HR Review Team Output"
+    else:
+         header = "Agent Output"
 
     return render_template(
         'output.html',
@@ -100,7 +122,7 @@ def check_status(job_id):
         output=output or "Still running...",
         dark_mode=True,
         done=done,
-        agent_name=agent_name
+        agent_name=header
     )
 
 if __name__ == '__main__':
