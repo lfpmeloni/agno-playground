@@ -27,7 +27,7 @@
       margin-bottom: 2rem;
     }
 
-    .sidebar button {
+    .sidebar a button {
       background-color: #2a2a2a;
       border: none;
       color: #f3f3f3;
@@ -51,7 +51,7 @@
       margin-bottom: 0.5rem;
     }
 
-    .prompt-bar {
+    .prompt-form {
       position: absolute;
       bottom: 1rem;
       left: 2rem;
@@ -63,7 +63,16 @@
       padding: 0.75rem;
     }
 
-    .prompt-bar textarea {
+    .prompt-form select {
+      margin-right: 1rem;
+      background-color: #2a2a2a;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 0.5rem;
+    }
+
+    .prompt-form textarea {
       flex: 1;
       resize: none;
       border: none;
@@ -75,7 +84,7 @@
       height: 3rem;
     }
 
-    .prompt-bar button {
+    .prompt-form button {
       margin-left: 1rem;
       background-color: #6366f1;
       border: none;
@@ -84,16 +93,6 @@
       padding: 0.5rem 1rem;
       border-radius: 5px;
       cursor: pointer;
-    }
-
-    select {
-      width: 100%;
-      padding: 0.4rem;
-      background-color: #2a2a2a;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      margin-bottom: 1rem;
     }
 
     .content {
@@ -105,14 +104,6 @@
   <div class="sidebar">
     <h1>PARENT AGENT UI</h1>
     <a href="/"><button>Home</button></a>
-    <form method="POST" id="agent-form">
-      <label for="agent">Select Agent</label>
-      <select name="agent" id="agent">
-        <option value="marketing_team">Marketing Team</option>
-        <option value="hr_team_coordinator">HR Review Team</option>
-        <!-- Future agents go here -->
-      </select>
-    </form>
   </div>
 
   <div class="main">
@@ -121,12 +112,12 @@
       <p>Start by selecting an agent and submitting a prompt using the input field at the bottom.</p>
     </div>
 
-    <form method="POST" class="prompt-bar" style="position: absolute; bottom: 1rem; left: 2rem; right: 2rem;">
-      <select name="agent" id="agent" style="margin-right: 1rem; max-width: 200px;">
+    <form method="POST" class="prompt-form">
+      <select name="agent" id="agent" required>
         <option value="marketing_team">Marketing Team</option>
         <option value="hr_team_coordinator">HR Review Team</option>
       </select>
-      <textarea name="prompt" placeholder="Ask anything..."></textarea>
+      <textarea name="prompt" placeholder="Ask anything..." required></textarea>
       <button type="submit">▶️ Run</button>
     </form>
   </div>
