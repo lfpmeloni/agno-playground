@@ -33,8 +33,9 @@ jobs_meta = {}  # maps job_id to metadata (e.g. {"agent": "marketing_team"})
 active_jobs_by_agent = {}
 running_jobs = set()
 
-# Define HR docs folder; adjust this if your project structure is different.
-HR_DOCS_DIR = os.path.join(os.path.dirname(__file__), 'hr_docs')
+# Set HR_DOCS_DIR to the actual hr_docs folder.
+# If app.py is in "playground/frontend", then go up one level and then into hr_docs.
+HR_DOCS_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'hr_docs'))
 if not os.path.exists(HR_DOCS_DIR):
     os.makedirs(HR_DOCS_DIR)
 
