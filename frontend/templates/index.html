@@ -121,7 +121,11 @@
       <p>Start by selecting an agent and submitting a prompt using the input field at the bottom.</p>
     </div>
 
-    <form method="POST" class="prompt-bar">
+    <form method="POST" class="prompt-bar" style="position: absolute; bottom: 1rem; left: 2rem; right: 2rem;">
+      <select name="agent" id="agent" style="margin-right: 1rem; max-width: 200px;">
+        <option value="marketing_team">Marketing Team</option>
+        <option value="hr_team_coordinator">HR Review Team</option>
+      </select>
       <textarea name="prompt" placeholder="Ask anything..."></textarea>
       <button type="submit">▶️ Run</button>
     </form>
