@@ -5,7 +5,13 @@ import io
 import uuid
 import asyncio
 from contextlib import redirect_stdout
+
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from teams.marketing_team import get_marketing_team
+
 
 app = Flask(__name__)
 
