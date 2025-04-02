@@ -52,7 +52,7 @@ async def run_team_agent(prompt, job_id, team_instance):
                 callback=stream_output
             )
 
-        # Clean and append captured stdout after completion
+        # Append captured stdout after completion
         clean_stdout = ansi_escape.sub('', f.getvalue())
         outputs[job_id] += clean_stdout
         outputs[job_id] += "\n✅ Task completed successfully.\n"
@@ -68,8 +68,18 @@ def index():
     if request.method == "POST":
         agent = request.form.get("agent")
         prompt = request.form.get("prompt")
-        # Process the agent and prompt...
-        return render_template("index.html")
+        if not prompt:
+            return render_template("index.html", error="Prompt cannot be empty.")
+        try:
+            team_instance = load_team(agent)
+        except ValueError as e:
+            return render_template("index.html", error=str(e))
+        job_id = str(uuid.uuid4())
+        # Run the team agent asynchronously in a new thread
+        threading.Thread(
+            target=lambda: asyncio.run(run_team_agent(prompt, job_id, team_instance))
+        ).start()
+        return redirect(url_for('check_status', job_id=job_id))
     return render_template("index.html")
 
 @app.route('/status/<job_id>')
@@ -77,12 +87,12 @@ def check_status(job_id):
     output = outputs.get(job_id)
     done = output and ("✅ Task completed" in output or "❌ Error" in output or "🏁 Job finished." in output)
 
-    # Handle AJAX polling requests
+    # For AJAX polling
     if request.headers.get("X-Requested-With") == "XMLHttpRequest":
         return output or "Still running..."
 
-    # NEW: infer agent name from output (hacky but works)
-    agent_name = "HR Review Team" if "BOLD_GOALS" in output else "Marketing Team"
+    # Infer agent name from output (hacky but works)
+    agent_name = "HR Review Team" if output and "BOLD_GOALS" in output else "Marketing Team"
 
     return render_template(
         'output.html',

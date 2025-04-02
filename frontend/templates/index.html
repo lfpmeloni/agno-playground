@@ -14,30 +14,38 @@
       height: 100vh;
       overflow: hidden;
     }
-
     .sidebar {
       width: 220px;
       background-color: #1a1a1a;
       padding: 1rem;
       box-shadow: 2px 0 5px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
-
     .sidebar h1 {
       font-size: 1.2rem;
       margin-bottom: 2rem;
     }
-
+    .sidebar select {
+      margin-bottom: 1rem;
+      background-color: #2a2a2a;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 0.5rem;
+      width: 100%;
+    }
     .sidebar a button {
       background-color: #2a2a2a;
       border: none;
       color: #f3f3f3;
       padding: 0.5rem 1rem;
-      margin-bottom: 1rem;
+      margin-top: 1rem;
       width: 100%;
       cursor: pointer;
       border-radius: 5px;
     }
-
     .main {
       flex: 1;
       display: flex;
@@ -45,12 +53,10 @@
       padding: 2rem;
       position: relative;
     }
-
     .main h2 {
       font-size: 1.5rem;
       margin-bottom: 0.5rem;
     }
-
     .prompt-form {
       position: absolute;
       bottom: 1rem;
@@ -62,16 +68,6 @@
       border-radius: 10px;
       padding: 0.75rem;
     }
-
-    .prompt-form select {
-      margin-right: 1rem;
-      background-color: #2a2a2a;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      padding: 0.5rem;
-    }
-
     .prompt-form textarea {
       flex: 1;
       resize: none;
@@ -83,7 +79,6 @@
       font-size: 1rem;
       height: 3rem;
     }
-
     .prompt-form button {
       margin-left: 1rem;
       background-color: #6366f1;
@@ -94,7 +89,6 @@
       border-radius: 5px;
       cursor: pointer;
     }
-
     .content {
       padding-bottom: 6rem;
     }
@@ -103,24 +97,38 @@
 <body>
   <div class="sidebar">
     <h1>PARENT AGENT UI</h1>
+    <!-- Team selector placed in the sidebar -->
+    <select id="agent" name="agent">
+      <option value="marketing_team">Marketing Team</option>
+      <option value="hr_team_coordinator">HR Review Team</option>
+    </select>
     <a href="/"><button>Home</button></a>
   </div>
 
   <div class="main">
     <div class="content">
       <h2>Welcome to the Parent Agent UI</h2>
-      <p>Start by selecting an agent and submitting a prompt using the input field at the bottom.</p>
+      <p>Start by submitting a prompt using the input field at the bottom.</p>
+      {% if error %}
+      <p style="color: red;">{{ error }}</p>
+      {% endif %}
     </div>
 
     <form method="POST" class="prompt-form">
-      <select name="agent" id="agent">
-        <option value="marketing_team">Marketing Team</option>
-        <option value="hr_team">HR Review Team</option>
-        <!-- Add more options as needed -->
-      </select>
+      <!-- Hidden input that will be updated with the selected agent from the sidebar -->
+      <input type="hidden" name="agent" id="agent-hidden" value="marketing_team">
       <textarea name="prompt" placeholder="Ask anything..."></textarea>
       <button type="submit">▶️ Run</button>
     </form>
+
+    <script>
+      // Sync the sidebar select with the hidden input in the form
+      const dropdown = document.getElementById("agent");
+      const hiddenAgent = document.getElementById("agent-hidden");
+      dropdown.addEventListener("change", () => {
+        hiddenAgent.value = dropdown.value;
+      });
+    </script>
   </div>
 </body>
 </html>
