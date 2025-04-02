@@ -112,14 +112,21 @@
       <p>Start by selecting an agent and submitting a prompt using the input field at the bottom.</p>
     </div>
 
-    <form method="POST" class="prompt-form">
-      <select name="agent" id="agent" required>
-        <option value="marketing_team">Marketing Team</option>
-        <option value="hr_team_coordinator">HR Review Team</option>
-      </select>
-      <textarea name="prompt" placeholder="Ask anything..." required></textarea>
+    <form method="POST" class="prompt-bar">
+      <input type="hidden" name="agent" id="agent-hidden" value="marketing_team">
+      <textarea name="prompt" placeholder="Ask anything..."></textarea>
       <button type="submit">▶️ Run</button>
     </form>
+    
+    <script>
+      // Keep dropdown and hidden input in sync
+      const dropdown = document.getElementById("agent");
+      const hiddenAgent = document.getElementById("agent-hidden");
+    
+      dropdown.addEventListener("change", () => {
+        hiddenAgent.value = dropdown.value;
+      });
+    </script>
   </div>
 </body>
 </html>
