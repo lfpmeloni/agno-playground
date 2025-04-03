@@ -1,3 +1,4 @@
+flask
 fastapi
 agno
 openai
@@ -11,4 +12,3 @@ wikipedia
 googlesearch-python
 pycountry
 tavily-python
-flask

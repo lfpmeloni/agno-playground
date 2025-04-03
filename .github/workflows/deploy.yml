@@ -1,0 +1,72 @@
+name: Build and deploy Agno Platform - Unified Entry Point
+
+on:
+  push:
+    branches:
+      - webapp
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Set up Python 3.12
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # Install Python dependencies
+      - name: Install Python dependencies
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          pip install -r requirements.txt
+
+      # Set up Node.js and pnpm for agent-ui
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Install agent-ui dependencies
+        working-directory: agno-server/agent-ui
+        run: pnpm install
+
+      # Zip the app excluding virtualenv
+      - name: Zip app for deployment
+        run: zip -r agno-entrypoint.zip . -x "venv/*"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: agno-entrypoint
+          path: agno-entrypoint.zip
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: agno-entrypoint
+
+      - name: Unzip artifact
+        run: unzip agno-entrypoint.zip
+
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: 'agno-webapp'
+          slot-name: 'Production'
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: .
