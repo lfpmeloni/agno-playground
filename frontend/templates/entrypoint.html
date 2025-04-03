@@ -1,19 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Agno Service Hub</title>
+  <meta charset="UTF-8" />
+  <title>Agno Platform - Entrypoint</title>
   <style>
     body {
       background: #111;
       color: #f3f3f3;
-      font-family: system-ui;
+      font-family: system-ui, sans-serif;
       padding: 3rem;
     }
+
     h1 {
       font-size: 2rem;
       margin-bottom: 1rem;
     }
+
     a {
       display: block;
       color: #8ab4f8;
@@ -21,15 +23,16 @@
       font-size: 1.2rem;
       text-decoration: none;
     }
+
     a:hover {
       text-decoration: underline;
     }
   </style>
 </head>
 <body>
-  <h1>Welcome to Agno Platform</h1>
-  <a href="http://localhost:3000" target="_blank">🧠 Agent UI (LLM Playground)</a>
-  <a href="http://localhost:8000" target="_blank">👤 Parent Agent UI</a>
-  <a href="http://localhost:8080" target="_blank">📄 Static Generated Pages</a>
+  <h1>Welcome to Agno Service Hub</h1>
+  <a href="https://agno-agent-ui.vercel.app" target="_blank">🧠 Agent UI (LLM Playground - External)</a>
+  <a href="/parent-agent" target="_blank">👤 Parent Agent UI</a>
+  <a href="/static-pages/sample.html" target="_blank">📄 Static Generated Page (Sample)</a>
 </body>
 </html>

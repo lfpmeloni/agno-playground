@@ -1,35 +1,23 @@
-# entrypoint.py
-from flask import Flask, render_template
-import subprocess
-import threading
+from flask import Flask, render_template, send_from_directory
 import os
 
 app = Flask(__name__, template_folder="frontend/templates")
 
-# Start Agent UI (needs to run via subprocess in background)
-def run_agent_ui():
-    os.chdir("agno-server/agent-ui")
-    subprocess.run(["pnpm", "start"])
+# Static HTML folder (generated insights pages)
+STATIC_PAGES_DIR = os.path.abspath("static_pages")
 
-# Start Playground (Agent registration API)
-def run_playground():
-    os.chdir("agno-server")
-    subprocess.run(["python3", "playground.py"])
-
-# Start Parent Agent UI
-def run_parent_agent_ui():
-    os.chdir("frontend")
-    subprocess.run(["python3", "app.py"])
-
-@app.route('/')
-def index():
+@app.route("/")
+def home():
     return render_template("entrypoint.html")
 
-if __name__ == '__main__':
-    # Start services in background threads
-    threading.Thread(target=run_playground, daemon=True).start()
-    threading.Thread(target=run_parent_agent_ui, daemon=True).start()
-    threading.Thread(target=run_agent_ui, daemon=True).start()
+@app.route("/parent-agent")
+def parent_agent_ui():
+    return render_template("index.html")
 
-    # Run entrypoint Flask app
-    app.run(host='0.0.0.0', port=5000)
+@app.route("/static-pages/<path:filename>")
+def static_pages(filename):
+    return send_from_directory(STATIC_PAGES_DIR, filename)
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
