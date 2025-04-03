@@ -11,7 +11,7 @@ from agents.mkt_content_generator import create_content_generator_agent
 
 # Storage and base URL
 agent_storage = "tmp/agents.db"
-PUBLIC_HTML_BASE_URL = "http://172.178.45.177:8080"
+PUBLIC_HTML_BASE_URL = "http://agno-webapp-d2bwbhahg3d3dnfr.canadacentral-01.azurewebsites.net/generated"
 
 def create_marketing_team():
     return Team(
