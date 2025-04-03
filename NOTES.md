@@ -99,5 +99,10 @@ sessions:
 - python3 -m http.server 8080
 - ctr+b d
 - source AgnoVenv/bin/activate
+- tmux new -s playground
 - cd ~/agno-server/playground
 - python playground.py
+- ctr+b d
+- cd ~/agno-server/playground/frontend
+- tmux new -s app
+- python app.py
