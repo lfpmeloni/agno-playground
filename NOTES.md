@@ -87,7 +87,7 @@ sessions:
 
 ## Starting up
 
-- ssh -i ~/agno-vm_key.pem azureuser@172.178.45.177
+- ssh -i ~/agno-persistent-vm_key.pem azureuser@20.185.81.253
 - cd ~/agno-server/agent-ui
 - tmux new -s agno
 - pnpm start

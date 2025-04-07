@@ -27,7 +27,7 @@ def create_content_generator_agent():
             "Build a clean HTML page that embeds links next to each insight.",
             "Save the page using SaveHTMLTool using this format: 'first_last_insights.html'.",
             "After saving the HTML, call update_index() with the filename to ensure the index.html is always up to date.",
-            "DO NOT print or display the HTML. Only return a confirmation and the link: http://172.178.45.177:8080/<filename>.html."
+            "DO NOT print or display the HTML. Only return a confirmation and the link: http://20.185.81.253:8080/<filename>.html."
         ],
         markdown=True,
         show_tool_calls=True,
